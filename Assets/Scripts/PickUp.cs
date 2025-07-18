@@ -4,7 +4,7 @@ using UnityEngine;
 public class PickUp : MonoBehaviour
 {
     private Transform _potentialPickUpItem;
-    private Transform _pickedUpItem;
+    public Transform PickedUpItem;
     
     public float CurrentWeight = 1f;
     
@@ -19,10 +19,10 @@ public class PickUp : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (_potentialPickUpItem && !_pickedUpItem)
+            if (_potentialPickUpItem && !PickedUpItem)
             {
-                _pickedUpItem =  _potentialPickUpItem;
-                var package = _pickedUpItem.GetComponent<Package>();
+                PickedUpItem =  _potentialPickUpItem;
+                var package = PickedUpItem.GetComponent<Package>();
                 
                 if (package)
                 {
@@ -30,32 +30,22 @@ public class PickUp : MonoBehaviour
                     CurrentWeight = package.Weight;
                 }
                 
-                _pickedUpItem.parent = transform;
-                _pickedUpItem.position = transform.position;
+                PickedUpItem.parent = transform;
+                PickedUpItem.position = transform.position;
                 
                 PickUpText.text = "Press 'F' to drop";
             }
             
-            else if (_pickedUpItem)
+            else if (PickedUpItem)
             {
-                var package = _pickedUpItem.GetComponent<Package>();
-                
-                if (package)
-                {
-                    package.DropOff();
-                    CurrentWeight = 1;
-                }
-                _pickedUpItem.parent = null;
-                _pickedUpItem = null;
-                
-                PickUpText.enabled = false;
+                DropPackage();
             }
         }
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if (_pickedUpItem != null) return;
+        if (PickedUpItem != null) return;
 
         if (other.CompareTag("Box"))
         {
@@ -66,7 +56,7 @@ public class PickUp : MonoBehaviour
     
     private void OnTriggerStay(Collider other)
     {
-        if (_pickedUpItem != null) return;
+        if (PickedUpItem != null) return;
 
         if (other.CompareTag("Box"))
         {
@@ -76,11 +66,26 @@ public class PickUp : MonoBehaviour
     
     private void OnTriggerExit(Collider other)
     {
-        if (_pickedUpItem != null) return;
+        if (PickedUpItem != null) return;
 
         if (other.CompareTag("Box"))
         {
             PickUpText.enabled = false;
         }
+    }
+
+    public void DropPackage()
+    {
+        var package = PickedUpItem.GetComponent<Package>();
+                
+        if (package)
+        {
+            package.DropOff();
+            CurrentWeight = 1;
+        }
+        PickedUpItem.parent = null;
+        PickedUpItem = null;
+                
+        PickUpText.enabled = false;
     }
 }

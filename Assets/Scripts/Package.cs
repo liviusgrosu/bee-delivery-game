@@ -2,10 +2,10 @@ using UnityEngine;
 
 public class Package : MonoBehaviour
 {
-    [HideInInspector]
+    [SerializeField]
     private float _minWeight = 1f;
-    [HideInInspector]
-    private float _maxWeight = 5f;
+    [SerializeField]
+    private float _maxWeight = 1f;
 
     public float Weight = 1f;
     
