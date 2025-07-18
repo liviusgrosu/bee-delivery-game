@@ -19,6 +19,9 @@ public class PlayerMovement : MonoBehaviour
     private Vector3 _input;
     private float _yaw;
     private float _pitch;
+
+    public PickUp PickUp;
+    public float CarryCapacity = 2f;
     
     private void Awake()
     {
@@ -45,7 +48,9 @@ public class PlayerMovement : MonoBehaviour
         float upInput = Input.GetKey(KeyCode.Q) ? 1 : 0;
         float downInput = Input.GetKey(KeyCode.E) ? -1 : 0;
         var combinedUpDown = upInput + downInput;
-        
+
+        var weightForce = Mathf.Clamp(PickUp.CurrentWeight / CarryCapacity, 1f, Mathf.Infinity);
+        speed /= weightForce;
         
         var moveInput = new Vector3(horizontal * speed, combinedUpDown * speed, vertical * speed);
         _input = transform.TransformDirection(moveInput);

@@ -6,6 +6,8 @@ public class PickUp : MonoBehaviour
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
     
+    public float CurrentWeight = 1f;
+    
     public TextMeshProUGUI PickUpText;
 
     private void Start()
@@ -20,13 +22,14 @@ public class PickUp : MonoBehaviour
             if (_potentialPickUpItem && !_pickedUpItem)
             {
                 _pickedUpItem =  _potentialPickUpItem;
-                var rb = _pickedUpItem.GetComponent<Rigidbody>();
-
-                if (rb)
+                var package = _pickedUpItem.GetComponent<Package>();
+                
+                if (package)
                 {
-                    rb.useGravity = false;
-                    rb.isKinematic = true;
+                    package.PickUp();
+                    CurrentWeight = package.Weight;
                 }
+                
                 _pickedUpItem.parent = transform;
                 _pickedUpItem.position = transform.position;
                 
@@ -35,12 +38,12 @@ public class PickUp : MonoBehaviour
             
             else if (_pickedUpItem)
             {
-                var rb = _pickedUpItem.GetComponent<Rigidbody>();
-
-                if (rb)
+                var package = _pickedUpItem.GetComponent<Package>();
+                
+                if (package)
                 {
-                    rb.useGravity = true;
-                    rb.isKinematic = false;
+                    package.DropOff();
+                    CurrentWeight = 1;
                 }
                 _pickedUpItem.parent = null;
                 _pickedUpItem = null;
