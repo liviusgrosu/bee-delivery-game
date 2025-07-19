@@ -29,7 +29,7 @@ public class GameManager : MonoBehaviour
     {
         if (_currentGoal)
         {
-            _currentGoal.GetComponent<Renderer>().material.color = Color.red;
+            _currentGoal.GetComponent<Renderer>().material.color = Color.black;
         }
         
         _currentGoal = Goals[Random.Range(0, Goals.Count)];

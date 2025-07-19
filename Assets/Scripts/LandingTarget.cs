@@ -23,8 +23,9 @@ public class LandingTarget : MonoBehaviour
     {
         transform.rotation = _startingRotation;
         
-        if (Physics.Raycast(PlayerTransform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, ~AvoidLayerMask))        
+        if (Physics.Raycast(PlayerTransform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity, ~AvoidLayerMask))
         {
+            Debug.Log(hit.collider.name);
             var distance = Vector3.Distance(PlayerTransform.position, hit.point);
             
             if (distance > minDistanceToShow)
