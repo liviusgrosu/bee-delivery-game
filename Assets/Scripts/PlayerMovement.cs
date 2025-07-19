@@ -27,6 +27,8 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _rb.linearDamping = Drag;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
     
     void Update()
