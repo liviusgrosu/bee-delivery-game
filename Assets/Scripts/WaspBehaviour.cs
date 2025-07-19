@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 
 public class WaspBehaviour : MonoBehaviour
@@ -23,6 +24,10 @@ public class WaspBehaviour : MonoBehaviour
     private Vector3 _originalPosition;
     private Quaternion _originalRotation;
 
+    private bool _isLockedFromAttacking;
+    [SerializeField]
+    private float _lockedTime;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
@@ -41,7 +46,13 @@ public class WaspBehaviour : MonoBehaviour
         {
             var direction = _player.position - transform.position;
             var velocityChange = ((direction * MaxSpeed) - _rb.linearVelocity);
-            _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
+            
+            if (!_isLockedFromAttacking)
+            {
+                _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
+            }
+
+            transform.rotation = Quaternion.LookRotation(direction);
         }
         else if (_currentState == State.Returning)
         {
@@ -59,6 +70,7 @@ public class WaspBehaviour : MonoBehaviour
             var direction = _originalPosition - transform.position;
             var velocityChange = ((direction * MaxSpeed) - _rb.linearVelocity);
             _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
+            transform.rotation = Quaternion.LookRotation(_originalPosition);
         }
     }
 
@@ -78,5 +90,29 @@ public class WaspBehaviour : MonoBehaviour
             _player = null;
             _currentState = State.Returning;
         }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        var obj = other.gameObject;
+
+        if (obj.CompareTag("Player") && !_isLockedFromAttacking)
+        {
+            var pickUp = obj.GetComponentInChildren<PickUp>();
+            if (pickUp.PickedUpItem)
+            {
+                pickUp.DropPackage();
+            }
+            
+            StartCoroutine(PauseEnemy());
+        }
+    }
+
+    private IEnumerator PauseEnemy()
+    {
+        _isLockedFromAttacking = true;
+        _rb.linearVelocity = Vector3.zero;
+        yield return new WaitForSeconds(_lockedTime);
+        _isLockedFromAttacking = false;
     }
 }
