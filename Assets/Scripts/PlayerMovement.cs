@@ -27,12 +27,15 @@ public class PlayerMovement : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _rb.linearDamping = Drag;
-        Cursor.visible = false;
-        Cursor.lockState = CursorLockMode.Locked;
     }
     
     void Update()
     {
+        if (UIManager.Instance.CurrentMenu == UIManager.MenuState.JobList)
+        {
+            return;
+        }
+        
         var mouseX = Input.GetAxis("Mouse X");
         var mouseY =  Input.GetAxis("Mouse Y");
         _yaw += mouseX * MouseSensitivityX;

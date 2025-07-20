@@ -26,6 +26,9 @@ public class PickUp : MonoBehaviour
                 if (package)
                 {
                     package.PickUp();
+
+                    GameManager.Instance.PickedUpPackage();
+                    
                     CurrentWeight = package.Weight;
                 }
                 
