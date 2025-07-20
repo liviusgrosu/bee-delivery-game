@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -25,13 +26,19 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public RectTransform PickUpSymbol;
     
     private bool _inProgress = false;
-    
+    private bool _completed = false;
+
+    private void Start()
+    {
+        GameManager.JobInProgress += ToggleJob;
+    }
+
     public void Init()
     {
         _dropOffText.text = $"Drop Off: {_orderData.Dropoff}";
         _pickUpText.text = $"Pick Up: {_orderData.Pickup}";
-        _payText.text = $"Pick Up: {_orderData.Pay}";
-        _weightText.text = $"Pick Up: {_orderData.Weight}";
+        _payText.text = $"Pay: ${_orderData.Pay}";
+        _weightText.text = $"Weight: {_orderData.Weight} Kg";
         
         var dropOffPos = UIManager.Instance.PoiList[_orderData.Dropoff];
         var pickUpPos = UIManager.Instance.PoiList[_orderData.Pickup];
@@ -75,6 +82,29 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         StartButton.interactable = false;
         StartButtonText.text = "Delivering";
         
-        GameManager.Instance.AssignJob(_orderData.Pickup, _orderData.Dropoff);
+        GameManager.Instance.AssignJob(
+            _orderData.Pickup, 
+            _orderData.Dropoff, 
+            _orderData.Weight, 
+            _orderData.Pay,
+            FinishedJob);
+    }
+
+    public void FinishedJob()
+    {
+        StartButtonText.text = "Completed";
+        _inProgress = false;
+        _completed = true;
+    }
+
+    public void ToggleJob(bool state)
+    {
+        if (_completed || _inProgress)
+        {
+            return;
+        }
+        
+        StartButton.interactable = state;
+        StartButtonText.text = state ? "Start" : "Unavailable";
     }
 }

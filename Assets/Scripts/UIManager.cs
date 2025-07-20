@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance;
     
     public TextMeshProUGUI PickUpText;
-    public TextMeshProUGUI ScoreText;
+    public TextMeshProUGUI PayText;
     public TextMeshProUGUI DeliveredPackagesText;
 
     public Transform PoiParent;
