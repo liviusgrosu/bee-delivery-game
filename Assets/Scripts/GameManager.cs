@@ -1,19 +1,44 @@
+using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using TMPro;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour
 {
-    private TextMeshProUGUI _scoreText;
+    public static GameManager Instance { get; private set; }
+    
+    public int PackageGoal = 5;
+    
+    private int _packagesDelivered;
     private int _currentScore;
     public List<Transform> SpawnPoints;
     public List<Transform> Goals;
     private Transform _currentGoal;
     public GameObject BoxPrefab;
+    
+    public bool IsDoneLevel => _packagesDelivered >= PackageGoal;
+    
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+    }
+    
     void Start()
     {
-        _scoreText = GameObject.Find("Score").GetComponent<TextMeshProUGUI>();
-        _scoreText.text = "Score: 0";
+        PlayerSpawnPoint.Instance.SpawnPlayer();
+        UIManager.Instance.ScoreText.text = "Score: 0";
+        UIManager.Instance.DeliveredPackagesText.text = $"Packages Remaining: {PackageGoal}";
+        Instantiate(BoxPrefab, SpawnPoints[Random.Range(0,  SpawnPoints.Count)].position, BoxPrefab.transform.rotation);
+        
         PickNewGoal();
     }
     
@@ -22,7 +47,9 @@ public class GameManager : MonoBehaviour
         Instantiate(BoxPrefab, SpawnPoints[Random.Range(0,  SpawnPoints.Count)].position, BoxPrefab.transform.rotation);
         PickNewGoal();
         _currentScore++;
-        _scoreText.text = "Score: " + _currentScore;
+        _packagesDelivered++;
+        UIManager.Instance.ScoreText.text = "Score: " + _currentScore;
+        UIManager.Instance.DeliveredPackagesText.text = $"Packages Remaining: {PackageGoal - _packagesDelivered}";
     }
 
     void PickNewGoal()
@@ -35,5 +62,10 @@ public class GameManager : MonoBehaviour
         _currentGoal = Goals[Random.Range(0, Goals.Count)];
         _currentGoal.GetComponent<Renderer>().material.color = Color.green;
         _currentGoal.GetComponent<Goal>().IsCurrentGoal = true;
+    }
+
+    public void CompleteLevel()
+    {
+        throw new NotImplementedException();
     }
 }
