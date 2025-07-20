@@ -8,11 +8,10 @@ public class PickUp : MonoBehaviour
     
     public float CurrentWeight = 1f;
     
-    public TextMeshProUGUI PickUpText;
 
     private void Start()
     {
-        PickUpText.enabled = false;
+        UIManager.Instance.PickUpText.enabled = false; 
     }
     
     private void Update()
@@ -33,7 +32,7 @@ public class PickUp : MonoBehaviour
                 PickedUpItem.parent = transform;
                 PickedUpItem.position = transform.position;
                 
-                PickUpText.text = "Press 'F' to drop";
+                UIManager.Instance.PickUpText.text = "Press 'F' to drop";
             }
             
             else if (PickedUpItem)
@@ -49,8 +48,8 @@ public class PickUp : MonoBehaviour
 
         if (other.CompareTag("Box"))
         {
-            PickUpText.enabled = true;
-            PickUpText.text = "Press 'F' to pickup";
+            UIManager.Instance.PickUpText.enabled = true;
+            UIManager.Instance.PickUpText.text = "Press 'F' to pickup";
         }
     }
     
@@ -70,7 +69,7 @@ public class PickUp : MonoBehaviour
 
         if (other.CompareTag("Box"))
         {
-            PickUpText.enabled = false;
+            UIManager.Instance.PickUpText.enabled = false; 
         }
     }
 
@@ -86,6 +85,6 @@ public class PickUp : MonoBehaviour
         PickedUpItem.parent = null;
         PickedUpItem = null;
                 
-        PickUpText.enabled = false;
+        UIManager.Instance.PickUpText.enabled = false; 
     }
 }
