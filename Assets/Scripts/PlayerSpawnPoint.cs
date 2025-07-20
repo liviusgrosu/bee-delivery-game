@@ -28,7 +28,7 @@ namespace DefaultNamespace
         {
             if (other.gameObject.CompareTag("Player") && GameManager.Instance.IsDoneLevel)
             {
-                GameManager.Instance.CompleteLevel();
+                UIManager.Instance.TriggerGameWinScreen();
             }
         }
     }

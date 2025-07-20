@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0889e855c19e584d9660ba8d40f3cb5, type: 3}
   m_Name: Order 2
   m_EditorClassIdentifier: 
-  Pickup: Plate
+  Pickup: Table
   Dropoff: Round Pot
   Pay: 10
   Weight: 0.01

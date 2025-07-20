@@ -10,6 +10,8 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI PickUpText;
     public TextMeshProUGUI PayText;
     public TextMeshProUGUI DeliveredPackagesText;
+    public TextMeshProUGUI OpenInstructionsText;
+    public TextMeshProUGUI GoBackHomeText;
 
     public Transform PoiParent;
     public Dictionary<string, RectTransform> PoiList;
@@ -19,13 +21,15 @@ public class UIManager : MonoBehaviour
     public enum MenuState
     {
         InGame,
-        JobList
+        JobList,
+        GameWin
     }
     
     public MenuState CurrentMenu = MenuState.InGame;
 
     [SerializeField] private GameObject _inGameMenu;
     [SerializeField] private GameObject _jobListMenu;
+    [SerializeField] private GameObject _gameWinScreen;
     
     private void Awake()
     {
@@ -63,6 +67,10 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
+            if (OpenInstructionsText.enabled)
+            {
+                OpenInstructionsText.enabled = false;
+            }
             switch (CurrentMenu)
             {
                 case  MenuState.InGame:
@@ -81,5 +89,15 @@ public class UIManager : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public void TriggerGameWinScreen()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        
+        _inGameMenu.SetActive(false);
+        _jobListMenu.SetActive(false);
+        _gameWinScreen.SetActive(true);
     }
 }

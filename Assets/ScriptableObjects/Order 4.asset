@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c0889e855c19e584d9660ba8d40f3cb5, type: 3}
   m_Name: Order 4
   m_EditorClassIdentifier: 
-  Pickup: Tree Roots
-  Dropoff: Square Pot
+  Pickup: Grass
+  Dropoff: Tree Roots
   Pay: 50
   Weight: 1
