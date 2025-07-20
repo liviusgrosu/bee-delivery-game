@@ -18,12 +18,9 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField]
-    private int _packageGoal = 4;
+    private int _packageGoal = 1;
     public int PackagesDelivered;
     public float Paid;
-    
-    private int _packagesDelivered;
-    private int _currentScore;
 
     public Transform PickUpPoints;
     public Transform DropOffPoints;
@@ -34,12 +31,13 @@ public class GameManager : MonoBehaviour
     private Transform _currentGoal;
     public GameObject BoxPrefab;
     
-    public bool IsDoneLevel => _packagesDelivered >= _packageGoal;
+    public bool IsDoneLevel => PackagesDelivered >= _packageGoal;
     
     public static Action<bool> JobInProgress;
     private Action _onJobComplete;
 
     public GameObject PackageMarker;
+    public Transform PlayerSpawn;
     
     void Awake()
     {
@@ -101,6 +99,15 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.DeliveredPackagesText.text = $"Packages Delivered: {PackagesDelivered}/{_packageGoal}";
         UIManager.Instance.PayText.text = $"Pay: ${Paid}";
         PackageMarker.SetActive(false);
+
+        if (IsDoneLevel)
+        {
+            PackageMarker.SetActive(true);
+            PackageMarker.GetComponent<Bobbing>().enabled = false;
+            PackageMarker.transform.position = PlayerSpawn.position + new Vector3(0, 2f, 0);
+            PackageMarker.GetComponent<Bobbing>().enabled = true;
+            UIManager.Instance.GoBackHomeText.gameObject.SetActive(true);
+        }
     }
 
     public void CompleteLevel()
