@@ -16,8 +16,11 @@ public struct CurrentJob
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    
-    public int PackageGoal = 5;
+
+    [SerializeField]
+    private int _packageGoal = 4;
+    public int PackagesDelivered;
+    public float Paid;
     
     private int _packagesDelivered;
     private int _currentScore;
@@ -28,12 +31,13 @@ public class GameManager : MonoBehaviour
     private Transform _currentPickupPoint;
     private Transform _currentDropoffPoint;
     
-    // private List<Transform> PickUpPoints;
-    // private List<Transform> DropOffPoints;
     private Transform _currentGoal;
     public GameObject BoxPrefab;
     
-    public bool IsDoneLevel => _packagesDelivered >= PackageGoal;
+    public bool IsDoneLevel => _packagesDelivered >= _packageGoal;
+    
+    public static Action<bool> JobInProgress;
+    private Action _onJobComplete;
 
     public GameObject PackageMarker;
     
@@ -51,22 +55,29 @@ public class GameManager : MonoBehaviour
     
     void Start()
     {
+        UIManager.Instance.DeliveredPackagesText.text = $"Packages Delivered: {PackagesDelivered}/{_packageGoal}";
+        UIManager.Instance.PayText.text = $"Pay: ${Paid}";
+        
         PackageMarker.SetActive(false);
         PlayerSpawnPoint.Instance.SpawnPlayer();
     }
 
-    public void AssignJob(string start, string end)
+    public void AssignJob(string start, string end, float weight, float pay, Action onJobComplete)
     {
+        JobInProgress?.Invoke(false);
+        
+        _onJobComplete = onJobComplete;
         _currentPickupPoint = PickUpPoints.Find($"{start} Pickup");
         _currentDropoffPoint = DropOffPoints.Find($"{end} Dropoff");
 
         _currentDropoffPoint.GetComponent<Goal>().IsCurrentGoal = true;
         
-        Instantiate(BoxPrefab, _currentPickupPoint.position, BoxPrefab.transform.rotation);
+        var package = Instantiate(BoxPrefab, _currentPickupPoint.position, BoxPrefab.transform.rotation);
+        var packageComponent =  package.GetComponent<Package>();
+        packageComponent.Weight = weight;
+        packageComponent.PayOut = pay;
         
         PackageMarker.SetActive(true);
-
-
         PackageMarker.GetComponent<Bobbing>().enabled = false;
         PackageMarker.transform.position = _currentPickupPoint.position + new Vector3(0, 1f, 0);
         PackageMarker.GetComponent<Bobbing>().enabled = true;
@@ -79,8 +90,16 @@ public class GameManager : MonoBehaviour
         PackageMarker.GetComponent<Bobbing>().enabled = true;
     }
 
-    public void DeliveredPackage()
+    public void DeliveredPackage(float payOut)
     {
+        JobInProgress?.Invoke(true);
+        _onJobComplete?.Invoke();
+        _onJobComplete = null;
+        
+        PackagesDelivered++;
+        Paid += payOut;
+        UIManager.Instance.DeliveredPackagesText.text = $"Packages Delivered: {PackagesDelivered}/{_packageGoal}";
+        UIManager.Instance.PayText.text = $"Pay: ${Paid}";
         PackageMarker.SetActive(false);
     }
 

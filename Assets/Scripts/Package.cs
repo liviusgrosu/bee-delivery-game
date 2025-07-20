@@ -8,6 +8,7 @@ public class Package : MonoBehaviour
     private float _maxWeight = 1f;
 
     public float Weight = 1f;
+    public float PayOut = 1f;
     
     private Rigidbody _rb;
     private Collider _col;
@@ -16,7 +17,6 @@ public class Package : MonoBehaviour
     {
         _rb = GetComponent<Rigidbody>();
         _col = GetComponent<Collider>();
-        Weight = Random.Range(_minWeight, _maxWeight);
     }
 
     public void PickUp()

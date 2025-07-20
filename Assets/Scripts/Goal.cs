@@ -8,7 +8,8 @@ public class Goal :  MonoBehaviour
     {
         if (collision.transform.CompareTag("Box") && IsCurrentGoal)
         {
-            GameManager.Instance.DeliveredPackage();
+            var pay = collision.gameObject.GetComponent<Package>().PayOut;
+            GameManager.Instance.DeliveredPackage(pay);
             IsCurrentGoal = false;
             Destroy(collision.gameObject);
         }
