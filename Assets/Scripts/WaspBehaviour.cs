@@ -1,5 +1,5 @@
-using System;
 using System.Collections;
+using Unity.Mathematics.Geometry;
 using UnityEngine;
 
 public class WaspBehaviour : MonoBehaviour
@@ -8,6 +8,7 @@ public class WaspBehaviour : MonoBehaviour
     {
         Idle,
         Chasing,
+        Patroling,
         Returning
     }
 
@@ -28,14 +29,24 @@ public class WaspBehaviour : MonoBehaviour
     [SerializeField]
     private float _lockedTime;
 
+    public EnemyPathing path;
+    private Transform _currentPoint;
+    private int _pathIndex;
+    private bool _isPatroling => path != null;
+
     private void Awake()
     {
         _rb = GetComponent<Rigidbody>();
-        _currentState = State.Idle;
+        _currentState = _isPatroling ? State.Patroling : State.Idle;
     }
 
     private void Start()
     {
+        if (_isPatroling)
+        {
+            _currentPoint = path.Points[_pathIndex];
+        }
+        
         _originalPosition =  transform.position;
         _originalRotation = transform.rotation;
     }
@@ -63,7 +74,7 @@ public class WaspBehaviour : MonoBehaviour
                 _rb.linearVelocity = Vector3.zero;
                 transform.rotation = _originalRotation;
                 transform.position = _originalPosition;
-                _currentState = State.Idle;
+                _currentState = _isPatroling ? State.Patroling : State.Idle;
                 return;
             }
             
@@ -71,6 +82,25 @@ public class WaspBehaviour : MonoBehaviour
             var velocityChange = ((direction * MaxSpeed) - _rb.linearVelocity);
             _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
             transform.rotation = Quaternion.LookRotation(_originalPosition);
+        }
+        else if (_currentState == State.Patroling)
+        {
+            var distanceFromPoint = Vector3.Distance(transform.position, _currentPoint.position);
+            
+            if (distanceFromPoint < 0.1f)
+            {
+                _pathIndex = _pathIndex >= path.Points.Count - 1 
+                    ? 0
+                    : _pathIndex + 1;
+                
+                _currentPoint = path.Points[_pathIndex];
+                return;
+            }
+            
+            var direction = _currentPoint.position - transform.position;
+            var velocityChange = ((direction * MaxSpeed) - _rb.linearVelocity);
+            _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
+            transform.rotation = Quaternion.LookRotation(_currentPoint.position);
         }
     }
 
