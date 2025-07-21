@@ -15,4 +15,4 @@ MonoBehaviour:
   Pickup: Log
   Dropoff: Under Table
   Pay: 30
-  Weight: 0.2
+  Weight: 10

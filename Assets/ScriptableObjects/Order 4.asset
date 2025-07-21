@@ -15,4 +15,4 @@ MonoBehaviour:
   Pickup: Grass
   Dropoff: Tree Roots
   Pay: 50
-  Weight: 1
+  Weight: 4
