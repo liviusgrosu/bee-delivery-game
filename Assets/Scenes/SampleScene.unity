@@ -1776,7 +1776,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &376802966
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2330,6 +2330,7 @@ MonoBehaviour:
   CurrentMenu: 0
   _inGameMenu: {fileID: 260656098}
   _jobListMenu: {fileID: 1538645894}
+  _gameWinScreen: {fileID: 376802965}
 --- !u!1001 &485926115
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3289,6 +3290,7 @@ MonoBehaviour:
   DropOffPoints: {fileID: 138831904}
   BoxPrefab: {fileID: 1517296144056424713, guid: 52b210a7600fd5047a6465f205a075a8, type: 3}
   PackageMarker: {fileID: 613772}
+  PlayerSpawn: {fileID: 456337297}
 --- !u!4 &700513809
 Transform:
   m_ObjectHideFlags: 0
@@ -11226,10 +11228,10 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 410087041}
+  - {fileID: 700513809}
   - {fileID: 832575519}
   - {fileID: 482992824}
   - {fileID: 1324245196}
-  - {fileID: 700513809}
   - {fileID: 138831904}
   - {fileID: 1589292969}
   - {fileID: 905319821}
