@@ -15,4 +15,4 @@ MonoBehaviour:
   Pickup: Table
   Dropoff: Round Pot
   Pay: 10
-  Weight: 0.01
+  Weight: 5
