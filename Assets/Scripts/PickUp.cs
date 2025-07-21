@@ -27,6 +27,7 @@ public class PickUp : MonoBehaviour
                 {
                     package.PickUp();
 
+                    PlayerSoundPlayer.Instance.PackagePickUpSound();
                     GameManager.Instance.PickedUpPackage();
                     
                     CurrentWeight = package.Weight;

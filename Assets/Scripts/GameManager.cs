@@ -77,14 +77,14 @@ public class GameManager : MonoBehaviour
         
         PackageMarker.SetActive(true);
         PackageMarker.GetComponent<Bobbing>().enabled = false;
-        PackageMarker.transform.position = _currentPickupPoint.position + new Vector3(0, 1f, 0);
+        PackageMarker.transform.position = _currentPickupPoint.position + new Vector3(0, 4f, 0);
         PackageMarker.GetComponent<Bobbing>().enabled = true;
     }
 
     public void PickedUpPackage()
     {
         PackageMarker.GetComponent<Bobbing>().enabled = false;
-        PackageMarker.transform.position = _currentDropoffPoint.position + new Vector3(0, 2f, 0);
+        PackageMarker.transform.position = _currentDropoffPoint.position + new Vector3(0, 4f, 0);
         PackageMarker.GetComponent<Bobbing>().enabled = true;
     }
 
