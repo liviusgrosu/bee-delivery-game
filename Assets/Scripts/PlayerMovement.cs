@@ -58,12 +58,12 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(-_pitch, _yaw, 0);
         
         // Get movement input from WASD/Arrow keys
-        IsSprinting = Input.GetKey(KeyCode.Space);
+        IsSprinting = Input.GetKey(KeyCode.Mouse0);
         var speed = IsSprinting ? SprintMultiplier * MaxSpeed : MaxSpeed;
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
-        float upInput = Input.GetKey(KeyCode.Q) ? 1 : 0;
-        float downInput = Input.GetKey(KeyCode.E) ? -1 : 0;
+        float upInput = Input.GetKey(KeyCode.Space) ? 1 : 0;
+        float downInput = Input.GetKey(KeyCode.LeftShift) ? -1 : 0;
         var combinedUpDown = upInput + downInput;
 
         var weightForce = Mathf.Clamp(PickUp.CurrentWeight / CarryCapacity, 1f, Mathf.Infinity);

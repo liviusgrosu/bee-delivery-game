@@ -128,6 +128,7 @@ public class WaspBehaviour : MonoBehaviour
 
         if (obj.CompareTag("Player") && !_isLockedFromAttacking)
         {
+            PlayerSoundPlayer.Instance.PlayHurtSound();
             var pickUp = obj.GetComponentInChildren<PickUp>();
             if (pickUp.PickedUpItem)
             {
