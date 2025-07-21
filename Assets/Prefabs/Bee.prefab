@@ -54,6 +54,7 @@ MonoBehaviour:
   Acceleration: 10
   Drag: 5
   SprintMultiplier: 2
+  IsSprinting: 0
   MouseSensitivityX: 1
   MouseSensitivityY: 0.5
   PickUp: {fileID: 2072419721731212703}
@@ -467,6 +468,10 @@ PrefabInstance:
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: a40b77a8f15342b40b01a338a1e5fc6d, type: 2}
+    - target: {fileID: -1823322365421230674, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: e444d1e3af78b8e44ae500d9fa6e0f80, type: 2}
     - target: {fileID: 919132149155446097, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
       propertyPath: m_Name
       value: Model
@@ -498,10 +503,45 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5580123019626934095}
   m_SourcePrefab: {fileID: 100100000, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+--- !u!4 &5826140653792659427 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 736648143065935002, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+  m_PrefabInstance: {fileID: 6549225184885435257}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &6206783042786055720 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+  m_PrefabInstance: {fileID: 6549225184885435257}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5580123019626934095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6206783042786055720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c7c0b6de5808b94cbf02bb10b9311df, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  leftWing: {fileID: 5826140653792659427}
+  rightWing: {fileID: 9082192458593759850}
+  flapSpeed: 100
+  sprintFlapSpeed: 150
+  flapAngle: 20
 --- !u!4 &6730978077790047378 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
+  m_PrefabInstance: {fileID: 6549225184885435257}
+  m_PrefabAsset: {fileID: 0}
+--- !u!4 &9082192458593759850 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: -6563459410573321965, guid: 2c7f2ee7c2a01d448b1ed353f77251dd, type: 3}
   m_PrefabInstance: {fileID: 6549225184885435257}
   m_PrefabAsset: {fileID: 0}
