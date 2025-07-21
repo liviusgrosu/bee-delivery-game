@@ -3,12 +3,16 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public static PlayerMovement Instance { get; private set; }
+
     [Header("Movement")]
     public float MaxSpeed = 5f;
     public float Acceleration = 10f;
     public float Drag = 5f;
     public float SprintMultiplier = 5f;
 
+    [HideInInspector]
+    public bool IsSprinting;
     private float _currentSpeed;
     
     [Header("Mouse")]
@@ -25,6 +29,14 @@ public class PlayerMovement : MonoBehaviour
     
     private void Awake()
     {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        Instance = this;
+        
         _rb = GetComponent<Rigidbody>();
         _rb.linearDamping = Drag;
     }
@@ -46,8 +58,8 @@ public class PlayerMovement : MonoBehaviour
         transform.rotation = Quaternion.Euler(-_pitch, _yaw, 0);
         
         // Get movement input from WASD/Arrow keys
-        var isSprinting = Input.GetKey(KeyCode.Space);
-        var speed = isSprinting ? SprintMultiplier * MaxSpeed : MaxSpeed;
+        IsSprinting = Input.GetKey(KeyCode.Space);
+        var speed = IsSprinting ? SprintMultiplier * MaxSpeed : MaxSpeed;
         float horizontal = Input.GetAxisRaw("Horizontal");
         float vertical = Input.GetAxisRaw("Vertical");
         float upInput = Input.GetKey(KeyCode.Q) ? 1 : 0;
