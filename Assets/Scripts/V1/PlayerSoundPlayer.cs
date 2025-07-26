@@ -56,7 +56,7 @@ public class PlayerSoundPlayer : MonoBehaviour
         flyingSource.pitch = normalPitch;
         flyingSource.Play();
 
-        // One-shot source: no special config
+        oneShotSource.volume = 0.4f;
         oneShotSource.playOnAwake = false;
     }
 

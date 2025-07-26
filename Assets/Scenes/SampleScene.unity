@@ -3308,7 +3308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d663e84dcc8508478a2fb4e4b9e7e31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _packageGoal: 1
+  _packageGoal: 4
   PackagesDelivered: 0
   Paid: 0
   PickUpPoints: {fileID: 1589292969}
@@ -4548,6 +4548,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Points:
+  - {fileID: 2116715929}
+  - {fileID: 1406545627}
+  - {fileID: 1494738802}
+  - {fileID: 1811658511}
+  - {fileID: 2116715929}
+  - {fileID: 1406545627}
+  - {fileID: 1494738802}
+  - {fileID: 1811658511}
   - {fileID: 2116715929}
   - {fileID: 1406545627}
   - {fileID: 1494738802}
