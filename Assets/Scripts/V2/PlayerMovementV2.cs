@@ -30,40 +30,42 @@ public class PlayerMovementV2 : MonoBehaviour
     
     void Update()
     {
-        xRotation = freeLookCamera.transform.rotation.eulerAngles.x;
-        
-        if (Input.GetKey(KeyCode.W))
+        var horizontalInput = Input.GetAxisRaw("Horizontal");
+        var verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (verticalInput != 0f)
         {
-            MoveCharacter();
+            var verticalSpeed = Mathf.Clamp(verticalInput * moveSpeed, -moveSpeed / 2, moveSpeed);
+            MoveCharacterForward(verticalSpeed);
         }
-        else
+
+        if (horizontalInput != 0f)
+        {
+            var horizontalSpeed = (horizontalInput * moveSpeed) / 2;
+            MoveCharacterHorizontal(horizontalSpeed);
+        }
+        
+        if (horizontalInput == 0f && verticalInput == 0f)
         {
             DisableMovement();
         }
-        
-        transform.position = new Vector3(transform.position.x, currentHeight, transform.position.z);
+        else
+        {
+            var flyDirection = freeLookCamera.transform.forward.normalized;
+            transform.rotation = Quaternion.LookRotation(flyDirection);
+        }
     }
 
-    private void MoveCharacter()
+    private void MoveCharacterForward(float speed)
     {
-        var cameraForward = new Vector3(
-            freeLookCamera.transform.forward.x,
-            0, 
-            freeLookCamera.transform.forward.z
-        );
-        
-        transform.rotation = Quaternion.LookRotation(cameraForward);
-        transform.Rotate(new Vector3(xRotation, 0, 0), Space.Self);
-        
-        var forward = freeLookCamera.transform.forward;
-        var flyDirection = forward.normalized;
-        
-        currentHeight += flyDirection.y * moveSpeed * Time.deltaTime;
-        
-        transform.position += flyDirection * (moveSpeed * Time.deltaTime);
-        transform.position = new Vector3(transform.position.x, currentHeight, transform.position.z);
+        transform.position += freeLookCamera.transform.forward.normalized * (speed * Time.deltaTime);
     }
 
+    private void MoveCharacterHorizontal(float speed)
+    {
+        transform.position += freeLookCamera.transform.right * (speed * Time.deltaTime);
+    }
+    
     private void DisableMovement()
     {
         transform.rotation = Quaternion.Euler(0, transform.rotation.eulerAngles.y, 0);
