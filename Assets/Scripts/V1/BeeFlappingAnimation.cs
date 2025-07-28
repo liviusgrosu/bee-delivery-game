@@ -22,8 +22,7 @@ public class BeeFlappingAnimation : MonoBehaviour
 
     void Update()
     {
-        var speed = PlayerMovement.Instance.IsSprinting ? sprintFlapSpeed : flapSpeed;
-        float angle = Mathf.Sin(Time.time * speed) * flapAngle;
+        float angle = Mathf.Sin(Time.time * flapSpeed) * flapAngle;
 
         leftWing.localRotation = leftWingStartRot * Quaternion.Euler(angle, 0, 0);
         rightWing.localRotation = rightWingStartRot * Quaternion.Euler(-angle, 0, 0); // mirror the motion
