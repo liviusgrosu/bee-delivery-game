@@ -6,8 +6,9 @@ public class PlayerMovementV2 : MonoBehaviour
     public float MoveSpeed;
     public Camera FreeLookCamera;
     public float MaxRotationSpeed = 1f;
-    public Vector3 LastCameraForwardDirection;
-    public Vector3 LastCameraRightDirection;
+    public Vector3 _lastCameraForwardDirection;
+    public Vector3 _lastCameraRightDirection;
+    public Vector3 _lastCameraUpDirection;
     private bool _isFreeLooking;
     
     private void Awake()
@@ -34,8 +35,9 @@ public class PlayerMovementV2 : MonoBehaviour
 
         if (Input.GetMouseButtonDown(1))
         {
-            LastCameraForwardDirection = FreeLookCamera.transform.forward.normalized;
-            LastCameraRightDirection = FreeLookCamera.transform.right.normalized;
+            _lastCameraForwardDirection = FreeLookCamera.transform.forward.normalized;
+            _lastCameraRightDirection = FreeLookCamera.transform.right.normalized;
+            _lastCameraUpDirection = FreeLookCamera.transform.up.normalized;
             _isFreeLooking = true;
         }
 
@@ -62,7 +64,7 @@ public class PlayerMovementV2 : MonoBehaviour
             MoveCharacterVertical(verticalSpeed);
         }
 
-        if (!Input.GetMouseButton(1))
+        if (!_isFreeLooking)
         {
             var flyDirection = FreeLookCamera.transform.forward.normalized;
             var rotateDirection = Vector3.RotateTowards(
@@ -71,25 +73,31 @@ public class PlayerMovementV2 : MonoBehaviour
                 MaxRotationSpeed * Time.deltaTime,
                 0.0f
             );
-            transform.rotation = Quaternion.LookRotation(
-                rotateDirection,
-                FreeLookCamera.transform.up
-            );
+            transform.rotation = Quaternion.LookRotation(rotateDirection);
         }
     }
 
     private void MoveCharacterForward(float speed)
     {
-        transform.position += FreeLookCamera.transform.forward.normalized * (speed * Time.deltaTime);
+        transform.position += (_isFreeLooking
+            ? _lastCameraForwardDirection
+            : FreeLookCamera.transform.forward.normalized) 
+                              * (speed * Time.deltaTime);
     }
 
     private void MoveCharacterHorizontal(float speed)
     {
-        transform.position += FreeLookCamera.transform.right * (speed * Time.deltaTime);
+        transform.position += (_isFreeLooking
+            ? _lastCameraRightDirection
+            : FreeLookCamera.transform.right) 
+                              * (speed * Time.deltaTime);
     }
 
     private void MoveCharacterVertical(float speed)
     {
-        transform.position += FreeLookCamera.transform.up * (speed * Time.deltaTime);
+        transform.position += (_isFreeLooking
+        ? _lastCameraUpDirection
+        : FreeLookCamera.transform.up) 
+                              * (speed * Time.deltaTime);
     }
 }
