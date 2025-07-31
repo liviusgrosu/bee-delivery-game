@@ -54,6 +54,11 @@ public class PlayerMovementV2 : MonoBehaviour
     
     void Update()
     {
+        if (Input.GetKey(KeyCode.T))
+        {
+            Debug.Break();
+        }
+        
         var horizontalInput = Input.GetAxisRaw("Horizontal");
         var forwardsInput = Input.GetAxisRaw("Vertical");
         var verticalInput = (Input.GetKey(KeyCode.Space) ? 1f : 0f) + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
@@ -103,7 +108,7 @@ public class PlayerMovementV2 : MonoBehaviour
             _isMoving = false;
         }
         
-        ApplyBuzzing();
+        //ApplyBuzzing();
     }
 
     private void MoveCharacterForward(float forwardsInput)
