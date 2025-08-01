@@ -3,8 +3,21 @@ using UnityEngine;
 
 public class PickUpPackage : MonoBehaviour
 {
+    public static PickUpPackage Instance;
+    
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        
+        Instance = this;
+    }
     
     private void Update()
     {
