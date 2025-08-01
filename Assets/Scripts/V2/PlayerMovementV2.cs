@@ -10,7 +10,6 @@ public class PlayerMovementV2 : MonoBehaviour
     private Vector3 _lastCameraForwardDirection;
     private Vector3 _lastCameraRightDirection;
     private Vector3 _lastCameraUpDirection;
-    private bool _isFreeLooking;
     
     public Transform Model;
     
@@ -34,6 +33,8 @@ public class PlayerMovementV2 : MonoBehaviour
 
     private Rigidbody _rigidbody;
     [SerializeField] private float _maxSpeed;
+    
+    private bool _isFreeLooking;
     
     private void Awake()
     {
@@ -67,49 +68,14 @@ public class PlayerMovementV2 : MonoBehaviour
         }
 
         HandleFreeLooking();
+        HandleRotation();
         ApplyBuzzing();
     }
 
     private void FixedUpdate()
     {
-        HandleRotation();
         HandleMovement();
         //ClampVelocity();
-    }
-
-    private void HandleFreeLooking()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            _lastCameraForwardDirection = FreeLookCamera.transform.forward.normalized;
-            _lastCameraRightDirection = FreeLookCamera.transform.right.normalized;
-            _lastCameraUpDirection = FreeLookCamera.transform.up.normalized;
-            _isFreeLooking = true;
-        }
-
-        if (Input.GetMouseButtonUp(1))
-        {
-            _isFreeLooking = false;
-        }
-    }
-
-    private void HandleRotation()
-    {
-        if (_isFreeLooking)
-        {
-            return;
-        }
-        
-        var flyDirection = FreeLookCamera.transform.forward.normalized;
-        var targetRotation = Quaternion.LookRotation(flyDirection);
-
-        var intervaledRotation = Quaternion.RotateTowards(
-            _rigidbody.rotation,
-            targetRotation,
-            MaxRotationSpeed * Time.fixedDeltaTime
-        );
-
-        _rigidbody.MoveRotation(intervaledRotation);
     }
 
     private void HandleMovement()
@@ -143,6 +109,38 @@ public class PlayerMovementV2 : MonoBehaviour
                     ? _lastCameraUpDirection
                     : FreeLookCamera.transform.up,
                 verticalInput * 0.5f);
+        }
+    }
+    
+    private void HandleRotation()
+    {
+        if (_isFreeLooking)
+        {
+            return;
+        }
+        var flyDirection = FreeLookCamera.transform.forward.normalized;
+        var rotateDirection = Vector3.RotateTowards(
+            Model.forward, 
+            flyDirection, 
+            MaxRotationSpeed * Time.deltaTime,
+            0.0f
+        );
+        Model.rotation = Quaternion.LookRotation(rotateDirection);
+    }
+    
+    private void HandleFreeLooking()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            _lastCameraForwardDirection = FreeLookCamera.transform.forward.normalized;
+            _lastCameraRightDirection = FreeLookCamera.transform.right.normalized;
+            _lastCameraUpDirection = FreeLookCamera.transform.up.normalized;
+            _isFreeLooking = true;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            _isFreeLooking = false;
         }
     }
 
