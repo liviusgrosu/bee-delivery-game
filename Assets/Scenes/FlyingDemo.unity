@@ -13947,9 +13947,6 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1906362736}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1906362737}
   m_SourcePrefab: {fileID: 100100000, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
 --- !u!4 &1906362731 stripped
 Transform:
@@ -14029,27 +14026,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   multiAimConstraint: {fileID: 181774417}
---- !u!135 &1906362737
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1485829986}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.23
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &1939784228
 GameObject:
   m_ObjectHideFlags: 0
@@ -14693,6 +14669,8 @@ GameObject:
   - component: {fileID: 597557169193793656}
   - component: {fileID: 2212135051119275930}
   - component: {fileID: 8057451809101404727}
+  - component: {fileID: 8057451809101404728}
+  - component: {fileID: 8057451809101404729}
   m_Layer: 0
   m_Name: Bee
   m_TagString: Player
@@ -14723,9 +14701,9 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 0
-  m_IsKinematic: 1
-  m_Interpolate: 0
-  m_Constraints: 0
+  m_IsKinematic: 0
+  m_Interpolate: 2
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!4 &4562749947526288262
 Transform:
@@ -14912,13 +14890,52 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   FreeLookCamera: {fileID: 6326310852617901816}
-  MaxRotationSpeed: 5
+  MaxRotationSpeed: 20
   Model: {fileID: 1906362731}
   _bobAmplitude: 0.05
   _bobFrequency: 5
   _swayAmplitude: 0.05
   _swayFrequency: 3
   transitionSpeed: 5
+  _maxSpeed: 20
+--- !u!114 &8057451809101404728
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833764860064525560}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e072ab13b124cebb5d4724abf4cea23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _closestTarget: {fileID: 0}
+  _rayIntervals: 10
+  _terrainCollisionMask:
+    serializedVersion: 2
+    m_Bits: 0
+--- !u!135 &8057451809101404729
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833764860064525560}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Radius: 0.25
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
