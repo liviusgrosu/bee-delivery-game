@@ -12612,7 +12612,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!65 &1212884869
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -12731,7 +12731,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1361433611
 Transform:
   m_ObjectHideFlags: 0
@@ -13875,7 +13875,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: -1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalRotation.x
@@ -13883,7 +13883,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.7071068
+      value: 0.0000009536742
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalRotation.z
@@ -13895,7 +13895,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 90
+      value: 360
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 531c2da835a28eb42a286bba83b2c3bb, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -13965,7 +13965,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1485829986}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fff0960ef4ea6e04eac66b4a7fd2189d, type: 3}
   m_Name: 
@@ -13982,7 +13982,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1485829986}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 69c719eef42f54a4c91dc1fff392753a, type: 2}
   m_CullingMode: 0
@@ -14020,7 +14020,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1485829986}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 12fabdbc1a7c3b041ae9dbb4c977a9f5, type: 3}
   m_Name: 
@@ -14671,6 +14671,7 @@ GameObject:
   - component: {fileID: 8057451809101404727}
   - component: {fileID: 8057451809101404728}
   - component: {fileID: 8057451809101404729}
+  - component: {fileID: 8057451809101404730}
   m_Layer: 0
   m_Name: Bee
   m_TagString: Player
@@ -14702,7 +14703,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 2
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!4 &4562749947526288262
@@ -14890,7 +14891,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MoveSpeed: 5
   FreeLookCamera: {fileID: 6326310852617901816}
-  MaxRotationSpeed: 20
+  MaxRotationSpeed: 5
   Model: {fileID: 1906362731}
   _bobAmplitude: 0.05
   _bobFrequency: 5
@@ -14905,7 +14906,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 833764860064525560}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8e072ab13b124cebb5d4724abf4cea23, type: 3}
   m_Name: 
@@ -14936,6 +14937,22 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.25
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8057451809101404730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 833764860064525560}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cda0b877b8941c8ba7f698d08a16447, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _model: {fileID: 1906362731}
+  FreeLookCamera: {fileID: 6326310852617901816}
+  MaxRotationSpeed: 5
+  IsFreeLooking: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
