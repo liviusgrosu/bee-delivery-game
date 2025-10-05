@@ -1,4 +1,6 @@
 using System;
+using NUnit.Framework;
+using Unity.Cinemachine;
 using UnityEngine;
 
 public class PlayerMovementV2 : MonoBehaviour
@@ -28,13 +30,17 @@ public class PlayerMovementV2 : MonoBehaviour
     [SerializeField] private float transitionSpeed = 5f; 
     
     private Vector3 _initialLocalPos;
-    private bool _isMoving;
     private float _currentSwayTime;
 
     private Rigidbody _rigidbody;
     [SerializeField] private float _maxSpeed;
     
     private bool _isFreeLooking;
+    public bool IsWalking;
+    private bool _isLanding;
+    private SphereCollider _collider;
+    
+    private Vector3 _surfaceNormal = Vector3.up;
     
     private void Awake()
     {
@@ -48,6 +54,8 @@ public class PlayerMovementV2 : MonoBehaviour
         
         _rigidbody = GetComponent<Rigidbody>();
         _rigidbody.linearDamping = 2f;
+
+        _collider = GetComponent<SphereCollider>();
     }
 
     private void Start()
@@ -67,25 +75,65 @@ public class PlayerMovementV2 : MonoBehaviour
             Debug.Break();
         }
 
+        if (IsWalking)
+        {
+            return;
+        }
+        
         HandleFreeLooking();
         HandleRotation();
+
         ApplyBuzzing();
     }
 
     private void FixedUpdate()
     {
-        HandleMovement();
-        //ClampVelocity();
+        if (_isLanding)
+        {
+            return;
+        }
+        
+        if (IsWalking)
+        {
+            HandleWalkingMovement();
+        }
+        else
+        {
+            HandleFlyingMovement();
+        }
+        ClampVelocity();
     }
 
-    private void HandleMovement()
+    private void HandleWalkingMovement()
+    {
+        var horizontalInput = Input.GetAxisRaw("Horizontal");
+        var forwardsInput = Input.GetAxisRaw("Vertical");
+        var verticalInput = (Input.GetKey(KeyCode.Space) ? 1f : 0f) 
+                            + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
+
+        if (forwardsInput != 0f)
+        {
+            var direction = _isFreeLooking 
+                ? GetSurfaceDirection(_lastCameraForwardDirection) 
+                : GetSurfaceDirection(FreeLookCamera.transform.forward);
+            AddForce(direction, forwardsInput);
+        }
+        
+        if (horizontalInput != 0f)
+        {
+            var direction = _isFreeLooking
+                ? GetSurfaceDirection(_lastCameraRightDirection)
+                : GetSurfaceDirection(FreeLookCamera.transform.right);
+            AddForce(direction, horizontalInput * 0.5f);
+        }
+    }
+
+    private void HandleFlyingMovement()
     {
         var horizontalInput = Input.GetAxisRaw("Horizontal");
         var forwardsInput = Input.GetAxisRaw("Vertical");
         var verticalInput = (Input.GetKey(KeyCode.Space) ? 1f : 0f) 
                                 + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
-
-        _isMoving = false;
         
         if (forwardsInput != 0f)
         {
@@ -146,7 +194,6 @@ public class PlayerMovementV2 : MonoBehaviour
 
     private void AddForce(Vector3 direction, float input)
     {
-        _isMoving = true;
         _rigidbody.AddForce(direction.normalized * (input * _maxSpeed), ForceMode.Force);
     }
 
@@ -176,5 +223,29 @@ public class PlayerMovementV2 : MonoBehaviour
         var swayOffset = Mathf.Cos(time * _currentSwayFrequency) * _currentSwayAmplitude;
         
         Model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
+    }
+
+    public void StartLanding(Vector3 surfacePoint, Vector3 surfaceNormal)
+    {
+        _isLanding = true;
+        _rigidbody.linearVelocity = Vector3.zero;
+     
+        var landingPoint = surfacePoint + _collider.radius * surfaceNormal.normalized;
+        transform.position = landingPoint;
+        _surfaceNormal = surfaceNormal;
+
+        IsWalking = true;
+        _isLanding = false;
+    }
+
+    private Vector3 GetSurfaceDirection(Vector3 cameraDirection)
+    {
+        return Vector3.ProjectOnPlane(cameraDirection, _surfaceNormal).normalized;
+    }
+
+    public void UpdateSurfaceNormal(Vector3 surfacePoint, Vector3 surfaceNormal)
+    {
+        transform.position = surfacePoint;
+        _surfaceNormal = surfaceNormal;
     }
 }
