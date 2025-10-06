@@ -32,6 +32,7 @@ public class PlayerWalkingMovement : MonoBehaviour
     
     private Rigidbody _rigidbody;
     private Vector3 _relativeUp;
+    private Vector3 _relativeForward, _lastKnownRelativeForward;
     private Vector3 _inputMovement;
     private int _environmentMask;
     private bool _facingUp, _previousFacingUp;
@@ -51,6 +52,7 @@ public class PlayerWalkingMovement : MonoBehaviour
     private void Start()
     {
         _relativeUp = transform.up;
+        _relativeForward = _lastKnownRelativeForward = transform.forward;
         _environmentMask = LayerMask.GetMask("Environment");
     }
 
@@ -68,22 +70,24 @@ public class PlayerWalkingMovement : MonoBehaviour
     private void UpdateRotation()
     {
         _rigidbody.linearVelocity = GetDesiredMovement() * movementSpeed;
-        var rotation = Quaternion.FromToRotation(Vector3.up, _relativeUp);
-        transform.rotation = Quaternion.Lerp(transform.rotation, rotation, 10 * Time.deltaTime);
+        if (Vector3.Distance(_inputMovement, Vector3.zero) > 0.001f)
+        {
+            _lastKnownRelativeForward = _relativeForward;
+        }
+        var lookRotation = Quaternion.LookRotation(_lastKnownRelativeForward, _relativeUp);
+        transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 10 * Time.deltaTime);
     }
     
     private Vector3 GetDesiredMovement()
     {
-        var planeNormal = _relativeUp;
-        
         var yaw = freeLookCamera.eulerAngles.y;
 
-        var dot = Vector3.Dot(Vector3.Project(planeNormal, Vector3.up), Vector3.up);
+        var dot = Vector3.Dot(Vector3.Project(_relativeUp, Vector3.up), Vector3.up);
         _facingUp = dot > 0 || Mathf.Approximately(dot, 0);
 
         if (_previousFacingUp != _facingUp)
         {
-            var angle = Vector3.Angle(planeNormal, _previousFacingUp ? Vector3.up : Vector3.down);
+            var angle = Vector3.Angle(_relativeUp, _previousFacingUp ? Vector3.up : Vector3.down);
             if (Mathf.Abs(angle % 90) <= upFlipThreshold && !Mathf.Approximately(angle, 180))
             {
                 _facingUp = _previousFacingUp;
@@ -98,13 +102,12 @@ public class PlayerWalkingMovement : MonoBehaviour
             yaw *= -1;
         }
 
-        var planeRotation = Quaternion.FromToRotation(worldUp, planeNormal);
+        var planeRotation = Quaternion.FromToRotation(worldUp, _relativeUp);
         var playerRotation = Quaternion.AngleAxis(yaw, worldUp);
-        var movementForward = planeRotation * (playerRotation * Vector3.forward);
-        var movementRotation = Quaternion.LookRotation(movementForward, planeNormal);
+        _relativeForward = planeRotation * (playerRotation * Vector3.forward);
+        var movementRotation = Quaternion.LookRotation(_relativeForward, _relativeUp);
         var axisMovement = movementRotation * _inputMovement;
-
-        Debug.DrawRay(transform.position, movementForward, Color.blue);
+        Debug.DrawRay(transform.position, _relativeForward, Color.blue);
 
         return axisMovement * movementSpeed;
     }
