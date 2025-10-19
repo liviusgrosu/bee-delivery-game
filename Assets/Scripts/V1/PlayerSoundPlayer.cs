@@ -62,7 +62,7 @@ public class PlayerSoundPlayer : MonoBehaviour
 
     void Update()
     {
-        flyingSource.pitch = PlayerMovement.Instance.IsSprinting ? sprintPitch : normalPitch;
+        flyingSource.pitch = PlayerMovementOld.Instance.IsSprinting ? sprintPitch : normalPitch;
     }
 
     public void PlayHurtSound()

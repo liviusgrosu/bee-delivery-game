@@ -1,9 +1,9 @@
 using System;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerMovementOld : MonoBehaviour
 {
-    public static PlayerMovement Instance { get; private set; }
+    public static PlayerMovementOld Instance { get; private set; }
 
     [Header("Movement")]
     public float MaxSpeed = 5f;

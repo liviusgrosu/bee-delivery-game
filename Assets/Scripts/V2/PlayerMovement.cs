@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomRaycastHit
@@ -13,16 +14,12 @@ public class PlayerMovement : MonoBehaviour
 {
     public static PlayerMovement Instance;
     protected bool IsGrounded;
+    private bool IsTakingOff;
 
     [Tooltip("Radius of collider sphere")]
     [SerializeField] 
     protected float colliderCheckRadius = 0.35f;
     
-    [Tooltip("How far apart the player is from the ground after being snapped to it")]
-    [SerializeField] 
-    protected float groundOffset = 0.03f;
-    
-    protected Vector3 _relativeUp;
     protected int EnvironmentMask;
 
     private BeeFlappingAnimation flappingAnimation;
@@ -48,8 +45,17 @@ public class PlayerMovement : MonoBehaviour
     {
         // Check to see if the player hits a wall or ground
         // If so, then we need to trigger the landing animation
+        if (IsTakingOff)
+        {
+            return;
+        }
+        
         if (IsGrounded)
         {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                StartCoroutine(TakeOff());
+            }
             return;
         }
         
@@ -114,5 +120,29 @@ public class PlayerMovement : MonoBehaviour
         }
         
         return rayCasts;
+    }
+
+    private IEnumerator TakeOff()
+    {
+        const float duration = 0.1f;
+        var elapsed = 0f;
+
+        var currentPos = transform.position;
+        var finalPos = transform.position + PlayerWalkingMovement.Instance.RelativeUp;
+        
+        PlayerWalkingMovement.Instance.enabled = false;
+        IsTakingOff = true;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Slerp(currentPos, finalPos, elapsed / duration);
+            yield return null;
+        }
+
+        PlayerFlyingMovement.Instance.enabled = true;
+        flappingAnimation.enabled = true;
+        IsGrounded = false;
+        IsTakingOff = false;
     }
 }

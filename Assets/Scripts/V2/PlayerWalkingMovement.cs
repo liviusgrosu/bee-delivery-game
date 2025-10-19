@@ -23,7 +23,7 @@ public class PlayerWalkingMovement : MonoBehaviour
     private float colliderCheckRadius = 0.35f;
     
     private Rigidbody _rigidbody;
-    private Vector3 _relativeUp;
+    public Vector3 RelativeUp;
     private Vector3 _relativeForward, _lastKnownRelativeForward;
     private Vector3 _inputMovement;
     private int _environmentMask;
@@ -45,14 +45,9 @@ public class PlayerWalkingMovement : MonoBehaviour
 
     private void Start()
     {
-        _relativeUp = transform.up;
+        RelativeUp = transform.up;
         _relativeForward = _lastKnownRelativeForward = transform.forward;
         _environmentMask = LayerMask.GetMask("Environment");
-    }
-
-    private void OnEnable()
-    {
-        
     }
 
     private void Update()
@@ -73,7 +68,7 @@ public class PlayerWalkingMovement : MonoBehaviour
         {
             _lastKnownRelativeForward = _relativeForward;
         }
-        var lookRotation = Quaternion.LookRotation(_lastKnownRelativeForward, _relativeUp);
+        var lookRotation = Quaternion.LookRotation(_lastKnownRelativeForward, RelativeUp);
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, 10 * Time.deltaTime);
     }
     
@@ -81,12 +76,12 @@ public class PlayerWalkingMovement : MonoBehaviour
     {
         var yaw = freeLookCamera.eulerAngles.y;
 
-        var dot = Vector3.Dot(Vector3.Project(_relativeUp, Vector3.up), Vector3.up);
+        var dot = Vector3.Dot(Vector3.Project(RelativeUp, Vector3.up), Vector3.up);
         _facingUp = dot > 0 || Mathf.Approximately(dot, 0);
 
         if (_previousFacingUp != _facingUp)
         {
-            var angle = Vector3.Angle(_relativeUp, _previousFacingUp ? Vector3.up : Vector3.down);
+            var angle = Vector3.Angle(RelativeUp, _previousFacingUp ? Vector3.up : Vector3.down);
             if (Mathf.Abs(angle % 90) <= upFlipThreshold && !Mathf.Approximately(angle, 180))
             {
                 _facingUp = _previousFacingUp;
@@ -101,10 +96,10 @@ public class PlayerWalkingMovement : MonoBehaviour
             yaw *= -1;
         }
 
-        var planeRotation = Quaternion.FromToRotation(worldUp, _relativeUp);
+        var planeRotation = Quaternion.FromToRotation(worldUp, RelativeUp);
         var playerRotation = Quaternion.AngleAxis(yaw, worldUp);
         _relativeForward = planeRotation * (playerRotation * Vector3.forward);
-        var movementRotation = Quaternion.LookRotation(_relativeForward, _relativeUp);
+        var movementRotation = Quaternion.LookRotation(_relativeForward, RelativeUp);
         var axisMovement = movementRotation * _inputMovement;
         Debug.DrawRay(transform.position, _relativeForward, Color.blue);
         Debug.DrawRay(transform.position, transform.forward, Color.red);
@@ -143,8 +138,8 @@ public class PlayerWalkingMovement : MonoBehaviour
             return;
         }
 
-        _relativeUp = closest.Normal;
-        transform.position = closest.Point + (_relativeUp.normalized * (0.25f + groundOffset));
+        RelativeUp = closest.Normal;
+        transform.position = closest.Point + (RelativeUp.normalized * (0.25f + groundOffset));
     }
     
     private List<CustomRaycastHit> GetOverlappingHits()

@@ -10,6 +10,42 @@ public class PlayerFlyingMovement : MonoBehaviour
     private Vector3 _lastCameraRightDirection;
     private Vector3 _lastCameraUpDirection;
     
+    private float _horizontalInput;
+    private float _forwardsInput;
+    private float _verticalInput;
+
+    private float HorizontalInput
+    {
+        get => _horizontalInput;
+        set
+        {
+            _horizontalInput = value;
+            OnHorizontalInputChange?.Invoke(_horizontalInput);
+        }
+    }
+    
+    private float ForwardsInput
+    {
+        get => _forwardsInput;
+        set
+        {
+            _forwardsInput = value;
+            OnHorizontalInputChange?.Invoke(_forwardsInput);
+        }
+    }
+    
+    private float VerticalInput
+    {
+        get => _verticalInput;
+        set
+        {
+            _verticalInput = value;
+            OnHorizontalInputChange?.Invoke(_verticalInput);
+        }
+    }
+    
+    [SerializeField] private float _movementAcceleration = 0.5f;
+    
     public Transform Model;
     
     [Header("Bobbing Effect")]
@@ -33,6 +69,11 @@ public class PlayerFlyingMovement : MonoBehaviour
     [SerializeField] private float _maxSpeed;
     
     private bool _isFreeLooking;
+    
+    // Events
+    public static event Action<float> OnHorizontalInputChange;
+    public static event Action<float> OnForwardsInputChange;
+    public static event Action<float> OnVerticalInputChange;
     
     private void Awake()
     {
@@ -66,7 +107,8 @@ public class PlayerFlyingMovement : MonoBehaviour
         {
             Debug.Break();
         }
-        
+
+        GetInput();
         HandleFreeLooking();
         HandleRotation();
 
@@ -79,35 +121,28 @@ public class PlayerFlyingMovement : MonoBehaviour
         ClampVelocity();
     }
 
+    private void GetInput()
+    {
+        // REWORK
+        if (Input.GetAxis("Horizontal") != 0f)
+        {
+            HorizontalInput += Input.GetAxisRaw("Horizontal") * _movementAcceleration * Time.deltaTime;
+            HorizontalInput = Mathf.Clamp(HorizontalInput, -1f, 1f);
+        }
+        else
+        {
+            HorizontalInput = 0f;
+        }
+    }
+    
     private void HandleFlyingMovement()
     {
-        var horizontalInput = Input.GetAxisRaw("Horizontal");
-        var forwardsInput = Input.GetAxisRaw("Vertical");
-        var verticalInput = (Input.GetKey(KeyCode.Space) ? 1f : 0f) 
-                                + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
-        
-        if (forwardsInput != 0f)
-        {
-            AddForce(_isFreeLooking 
-                        ? _lastCameraForwardDirection 
-                        : FreeLookCamera.transform.forward,
-                        forwardsInput);
-        }
-
-        if (horizontalInput != 0f)
+        if (HorizontalInput != 0f)
         {
             AddForce(_isFreeLooking 
                     ? _lastCameraRightDirection 
                     : FreeLookCamera.transform.right,
-                horizontalInput * 0.5f);
-        }
-
-        if (verticalInput != 0f)
-        {
-            AddForce(_isFreeLooking
-                    ? _lastCameraUpDirection
-                    : FreeLookCamera.transform.up,
-                verticalInput * 0.5f);
+                HorizontalInput * 0.5f);
         }
     }
     
