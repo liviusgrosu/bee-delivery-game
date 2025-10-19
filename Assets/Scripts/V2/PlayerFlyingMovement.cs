@@ -1,12 +1,9 @@
 using System;
-using NUnit.Framework;
-using Unity.Cinemachine;
 using UnityEngine;
 
-public class PlayerMovementV2 : MonoBehaviour
+public class PlayerFlyingMovement : MonoBehaviour
 {
-    public static PlayerMovementV2 Instance { get; private set; }
-    public float MoveSpeed;
+    public static PlayerFlyingMovement Instance { get; private set; }
     public Camera FreeLookCamera;
     public float MaxRotationSpeed = 1f;
     private Vector3 _lastCameraForwardDirection;
@@ -36,11 +33,6 @@ public class PlayerMovementV2 : MonoBehaviour
     [SerializeField] private float _maxSpeed;
     
     private bool _isFreeLooking;
-    public bool IsWalking;
-    private bool _isLanding;
-    private SphereCollider _collider;
-    
-    private Vector3 _surfaceNormal = Vector3.up;
     
     private void Awake()
     {
@@ -54,8 +46,6 @@ public class PlayerMovementV2 : MonoBehaviour
         
         _rigidbody = GetComponent<Rigidbody>();
         _rigidbody.linearDamping = 2f;
-
-        _collider = GetComponent<SphereCollider>();
     }
 
     private void Start()
@@ -70,14 +60,11 @@ public class PlayerMovementV2 : MonoBehaviour
     
     private void Update()
     {
+        Debug.DrawRay(transform.position, transform.forward, Color.red);
+
         if (Input.GetKey(KeyCode.T))
         {
             Debug.Break();
-        }
-
-        if (IsWalking)
-        {
-            return;
         }
         
         HandleFreeLooking();
@@ -88,44 +75,8 @@ public class PlayerMovementV2 : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_isLanding)
-        {
-            return;
-        }
-        
-        if (IsWalking)
-        {
-            HandleWalkingMovement();
-        }
-        else
-        {
-            HandleFlyingMovement();
-        }
+        HandleFlyingMovement();
         ClampVelocity();
-    }
-
-    private void HandleWalkingMovement()
-    {
-        var horizontalInput = Input.GetAxisRaw("Horizontal");
-        var forwardsInput = Input.GetAxisRaw("Vertical");
-        var verticalInput = (Input.GetKey(KeyCode.Space) ? 1f : 0f) 
-                            + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
-
-        if (forwardsInput != 0f)
-        {
-            var direction = _isFreeLooking 
-                ? GetSurfaceDirection(_lastCameraForwardDirection) 
-                : GetSurfaceDirection(FreeLookCamera.transform.forward);
-            AddForce(direction, forwardsInput);
-        }
-        
-        if (horizontalInput != 0f)
-        {
-            var direction = _isFreeLooking
-                ? GetSurfaceDirection(_lastCameraRightDirection)
-                : GetSurfaceDirection(FreeLookCamera.transform.right);
-            AddForce(direction, horizontalInput * 0.5f);
-        }
     }
 
     private void HandleFlyingMovement()
@@ -175,6 +126,11 @@ public class PlayerMovementV2 : MonoBehaviour
         );
         Model.rotation = Quaternion.LookRotation(rotateDirection);
     }
+
+    public void ResetModelRotation()
+    {
+        Model.rotation = Quaternion.LookRotation(transform.forward, transform.up);
+    }
     
     private void HandleFreeLooking()
     {
@@ -223,29 +179,5 @@ public class PlayerMovementV2 : MonoBehaviour
         var swayOffset = Mathf.Cos(time * _currentSwayFrequency) * _currentSwayAmplitude;
         
         Model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
-    }
-
-    public void StartLanding(Vector3 surfacePoint, Vector3 surfaceNormal)
-    {
-        _isLanding = true;
-        _rigidbody.linearVelocity = Vector3.zero;
-     
-        var landingPoint = surfacePoint + _collider.radius * surfaceNormal.normalized;
-        transform.position = landingPoint;
-        _surfaceNormal = surfaceNormal;
-
-        IsWalking = true;
-        _isLanding = false;
-    }
-
-    private Vector3 GetSurfaceDirection(Vector3 cameraDirection)
-    {
-        return Vector3.ProjectOnPlane(cameraDirection, _surfaceNormal).normalized;
-    }
-
-    public void UpdateSurfaceNormal(Vector3 surfacePoint, Vector3 surfaceNormal)
-    {
-        transform.position = surfacePoint;
-        _surfaceNormal = surfaceNormal;
     }
 }

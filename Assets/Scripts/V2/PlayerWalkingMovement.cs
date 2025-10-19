@@ -2,14 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CustomRaycastHits
-{
-    public Collider Collider { get; set; }
-    public Vector3 Point { get; set; }
-    public Vector3 Normal { get; set; }
-    public float Distance { get; set; }
-}
-
 public class PlayerWalkingMovement : MonoBehaviour
 {
     public static PlayerWalkingMovement Instance;
@@ -35,7 +27,9 @@ public class PlayerWalkingMovement : MonoBehaviour
     private Vector3 _relativeForward, _lastKnownRelativeForward;
     private Vector3 _inputMovement;
     private int _environmentMask;
-    private bool _facingUp, _previousFacingUp;
+    private bool _facingUp;
+    // TODO: Need to dynamically calculate it (See BUG-1)
+    private bool _previousFacingUp = true;
     
     private void Awake()
     {
@@ -54,6 +48,11 @@ public class PlayerWalkingMovement : MonoBehaviour
         _relativeUp = transform.up;
         _relativeForward = _lastKnownRelativeForward = transform.forward;
         _environmentMask = LayerMask.GetMask("Environment");
+    }
+
+    private void OnEnable()
+    {
+        
     }
 
     private void Update()
@@ -108,6 +107,7 @@ public class PlayerWalkingMovement : MonoBehaviour
         var movementRotation = Quaternion.LookRotation(_relativeForward, _relativeUp);
         var axisMovement = movementRotation * _inputMovement;
         Debug.DrawRay(transform.position, _relativeForward, Color.blue);
+        Debug.DrawRay(transform.position, transform.forward, Color.red);
 
         return axisMovement * movementSpeed;
     }
@@ -122,7 +122,7 @@ public class PlayerWalkingMovement : MonoBehaviour
     private void GetGroundedState()
     {
         // Init
-        var closest = new CustomRaycastHits
+        var closest = new CustomRaycastHit
         {
             Distance = Mathf.Infinity
         };
@@ -147,7 +147,7 @@ public class PlayerWalkingMovement : MonoBehaviour
         transform.position = closest.Point + (_relativeUp.normalized * (0.25f + groundOffset));
     }
     
-    private List<CustomRaycastHits> GetOverlappingHits()
+    private List<CustomRaycastHit> GetOverlappingHits()
     {
         var overlappingColliders = new Collider[5];
         var hitCount = Physics.OverlapSphereNonAlloc(
@@ -156,11 +156,11 @@ public class PlayerWalkingMovement : MonoBehaviour
             overlappingColliders, 
             _environmentMask);
 
-        var rayCasts = new List<CustomRaycastHits>();
+        var rayCasts = new List<CustomRaycastHit>();
 
         for (var i = 0; i < hitCount; i++)
         {
-            var rayCast = new CustomRaycastHits
+            var rayCast = new CustomRaycastHit
             {
                 Collider = overlappingColliders[i]
             };
