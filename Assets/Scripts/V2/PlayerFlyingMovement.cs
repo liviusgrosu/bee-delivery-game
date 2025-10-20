@@ -4,71 +4,43 @@ using UnityEngine;
 public class PlayerFlyingMovement : MonoBehaviour
 {
     public static PlayerFlyingMovement Instance { get; private set; }
-    public Camera FreeLookCamera;
-    public float MaxRotationSpeed = 1f;
+    
+    // Camera
+    [SerializeField] private Camera freeLookCamera;
     private Vector3 _lastCameraForwardDirection;
     private Vector3 _lastCameraRightDirection;
     private Vector3 _lastCameraUpDirection;
-    
-    private float _horizontalInput;
-    private float _forwardsInput;
-    private float _verticalInput;
 
-    private float HorizontalInput
-    {
-        get => _horizontalInput;
-        set
-        {
-            _horizontalInput = value;
-            OnHorizontalInputChange?.Invoke(_horizontalInput);
-        }
-    }
+    private bool _isFreeLooking;
+
+    [Header("Movement")] 
+    [SerializeField] private float maxSpeed;
+    [SerializeField] private float forwardAcceleration = 15f;
+    [SerializeField] private float backwardAcceleration = 8f;
+    [SerializeField] private float strafeAcceleration = 10f;
+    [SerializeField] private float verticalAcceleration = 10f;
+    [SerializeField] private float maxRotationSpeed = 1f;
+    [SerializeField] private float drag = 2f;
     
-    private float ForwardsInput
-    {
-        get => _forwardsInput;
-        set
-        {
-            _forwardsInput = value;
-            OnHorizontalInputChange?.Invoke(_forwardsInput);
-        }
-    }
-    
-    private float VerticalInput
-    {
-        get => _verticalInput;
-        set
-        {
-            _verticalInput = value;
-            OnHorizontalInputChange?.Invoke(_verticalInput);
-        }
-    }
-    
-    [SerializeField] private float _movementAcceleration = 0.5f;
-    
-    public Transform Model;
+    private Vector3 _inputDirection;
     
     [Header("Bobbing Effect")]
-    [SerializeField] private float _bobAmplitude = 0.05f; 
-    [SerializeField] private float _bobFrequency = 5f;    
-
-    [SerializeField] private float _swayAmplitude = 0.05f;
-    [SerializeField] private float _swayFrequency = 3f;   
+    [SerializeField] private float bobAmplitude = 0.05f; 
+    [SerializeField] private float bobFrequency = 5f;    
+    [SerializeField] private float swayAmplitude = 0.05f;
+    [SerializeField] private float swayFrequency = 3f;   
+    [SerializeField] private float transitionSpeed = 5f; 
     
     private float _currentBobAmplitude;
     private float _currentBobFrequency;
     private float _currentSwayAmplitude;
     private float _currentSwayFrequency;
     
-    [SerializeField] private float transitionSpeed = 5f; 
-    
+    // Misc.    
+    [SerializeField] private Transform model;
     private Vector3 _initialLocalPos;
     private float _currentSwayTime;
-
     private Rigidbody _rigidbody;
-    [SerializeField] private float _maxSpeed;
-    
-    private bool _isFreeLooking;
     
     // Events
     public static event Action<float> OnHorizontalInputChange;
@@ -86,16 +58,16 @@ public class PlayerFlyingMovement : MonoBehaviour
         Instance = this;
         
         _rigidbody = GetComponent<Rigidbody>();
-        _rigidbody.linearDamping = 2f;
+        _rigidbody.linearDamping = 0f;
     }
 
     private void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
 
-        if (Model != null)
+        if (model != null)
         {
-            _initialLocalPos = Model.localPosition;
+            _initialLocalPos = model.localPosition;
         }
     }
     
@@ -109,40 +81,101 @@ public class PlayerFlyingMovement : MonoBehaviour
         }
 
         GetInput();
-        HandleFreeLooking();
         HandleRotation();
-
+        HandleFreeLooking();
         ApplyBuzzing();
     }
 
     private void FixedUpdate()
     {
-        HandleFlyingMovement();
+        HandleAdvancedMovement();
+        ApplyDrag();
         ClampVelocity();
     }
-
-    private void GetInput()
+    
+    void GetInput()
     {
-        // REWORK
-        if (Input.GetAxis("Horizontal") != 0f)
+        var horizontal = Input.GetAxisRaw("Horizontal");
+        var forwards = Input.GetAxisRaw("Vertical");
+        var vertical = (Input.GetKey(KeyCode.Space) ? 1f : 0f) 
+                            + (Input.GetKey(KeyCode.LeftShift) ? -1f : 0f);
+        
+        _inputDirection = new Vector3(horizontal, vertical, forwards);
+    }
+    
+    private void HandleAdvancedMovement()
+    {
+        // TODO: we might want to convert our _inputDirection to local space first
+        if (!(_inputDirection.magnitude > 0.1f))
         {
-            HorizontalInput += Input.GetAxisRaw("Horizontal") * _movementAcceleration * Time.deltaTime;
-            HorizontalInput = Mathf.Clamp(HorizontalInput, -1f, 1f);
+            return;
         }
-        else
+        var force = CalculateAccelerationForce(_inputDirection);
+        var relativeForce = GetRelativeForceDirection(force);
+        _rigidbody.AddForce(relativeForce, ForceMode.Acceleration);
+    }
+
+    private Vector3 GetRelativeForceDirection(Vector3 force)
+    {
+        if (_isFreeLooking)
         {
-            HorizontalInput = 0f;
+            return force.x * _lastCameraRightDirection+
+                   force.y * _lastCameraUpDirection +
+                   force.z * _lastCameraForwardDirection;
+        }
+
+        return freeLookCamera.transform.TransformDirection(force);
+    }
+    
+    private Vector3 CalculateAccelerationForce(Vector3 direction)
+    {
+        var accelerationForce = Vector3.zero;
+
+        accelerationForce.z = direction.z switch
+        {
+            > 0 => direction.z * forwardAcceleration,
+            < 0 => direction.z * backwardAcceleration,
+            _ => accelerationForce.z
+        };
+        
+        accelerationForce.x = direction.x * strafeAcceleration;
+        accelerationForce.y = direction.y * verticalAcceleration;
+        return transform.TransformDirection(accelerationForce);
+    }
+    
+    private void ApplyDrag()
+    {
+        if (_inputDirection.magnitude < 0.1f && _rigidbody.linearVelocity.magnitude > 0.1f)
+        {
+            _rigidbody.linearVelocity *= (1f - drag * Time.fixedDeltaTime);
         }
     }
     
-    private void HandleFlyingMovement()
+    private void ClampVelocity()
     {
-        if (HorizontalInput != 0f)
+        // Separate clamping for horizontal and vertical if needed
+        var horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
+        
+        if (horizontalVelocity.magnitude > maxSpeed)
         {
-            AddForce(_isFreeLooking 
-                    ? _lastCameraRightDirection 
-                    : FreeLookCamera.transform.right,
-                HorizontalInput * 0.5f);
+            horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
+            _rigidbody.linearVelocity = new Vector3(horizontalVelocity.x, _rigidbody.linearVelocity.y, horizontalVelocity.z);
+        }
+    }
+    
+    private void HandleFreeLooking()
+    {
+        if (Input.GetMouseButtonDown(1))
+        {
+            _lastCameraForwardDirection = freeLookCamera.transform.forward.normalized;
+            _lastCameraRightDirection = freeLookCamera.transform.right.normalized;
+            _lastCameraUpDirection = freeLookCamera.transform.up.normalized;
+            _isFreeLooking = true;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            _isFreeLooking = false;
         }
     }
     
@@ -152,67 +185,38 @@ public class PlayerFlyingMovement : MonoBehaviour
         {
             return;
         }
-        var flyDirection = FreeLookCamera.transform.forward.normalized;
+        var flyDirection = freeLookCamera.transform.forward.normalized;
         var rotateDirection = Vector3.RotateTowards(
-            Model.forward, 
+            model.forward, 
             flyDirection, 
-            MaxRotationSpeed * Time.deltaTime,
+            maxRotationSpeed * Time.deltaTime,
             0.0f
         );
-        Model.rotation = Quaternion.LookRotation(rotateDirection);
-    }
-
-    public void ResetModelRotation()
-    {
-        Model.rotation = Quaternion.LookRotation(transform.forward, transform.up);
+        model.rotation = Quaternion.LookRotation(rotateDirection);
     }
     
-    private void HandleFreeLooking()
+    public void ResetModelRotation()
     {
-        if (Input.GetMouseButtonDown(1))
-        {
-            _lastCameraForwardDirection = FreeLookCamera.transform.forward.normalized;
-            _lastCameraRightDirection = FreeLookCamera.transform.right.normalized;
-            _lastCameraUpDirection = FreeLookCamera.transform.up.normalized;
-            _isFreeLooking = true;
-        }
-
-        if (Input.GetMouseButtonUp(1))
-        {
-            _isFreeLooking = false;
-        }
-    }
-
-    private void AddForce(Vector3 direction, float input)
-    {
-        _rigidbody.AddForce(direction.normalized * (input * _maxSpeed), ForceMode.Force);
-    }
-
-    private void ClampVelocity()
-    {
-        if (_rigidbody.linearVelocity.magnitude > _maxSpeed)
-        {
-            _rigidbody.linearVelocity = _rigidbody.linearVelocity.normalized * _maxSpeed;
-        }
+        model.rotation = Quaternion.LookRotation(transform.forward, transform.up);
     }
 
     private void ApplyBuzzing()
     {
-        if (!Model)
+        if (!model)
         {
             return;
         }
 
-        _currentBobAmplitude = Mathf.Lerp(_currentBobAmplitude, _bobAmplitude, Time.deltaTime * transitionSpeed);
-        _currentBobFrequency = Mathf.Lerp(_currentBobFrequency, _bobFrequency, Time.deltaTime * transitionSpeed);
+        _currentBobAmplitude = Mathf.Lerp(_currentBobAmplitude, bobAmplitude, Time.deltaTime * transitionSpeed);
+        _currentBobFrequency = Mathf.Lerp(_currentBobFrequency, bobFrequency, Time.deltaTime * transitionSpeed);
 
-        _currentSwayAmplitude = Mathf.Lerp(_currentSwayAmplitude, _swayAmplitude, Time.deltaTime * transitionSpeed);
-        _currentSwayFrequency = Mathf.Lerp(_currentSwayFrequency, _swayFrequency, Time.deltaTime * transitionSpeed);
+        _currentSwayAmplitude = Mathf.Lerp(_currentSwayAmplitude, swayAmplitude, Time.deltaTime * transitionSpeed);
+        _currentSwayFrequency = Mathf.Lerp(_currentSwayFrequency, swayFrequency, Time.deltaTime * transitionSpeed);
 
         var time = Time.time;
         var bobOffset = Mathf.Sin(time * _currentBobFrequency) * _currentBobAmplitude;
         var swayOffset = Mathf.Cos(time * _currentSwayFrequency) * _currentSwayAmplitude;
         
-        Model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
+        model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
     }
 }
