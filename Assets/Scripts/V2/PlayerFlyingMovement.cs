@@ -1,5 +1,9 @@
 using System;
+using System.Collections;
+using System.IO.IsolatedStorage;
 using UnityEngine;
+using Quaternion = UnityEngine.Quaternion;
+using Vector3 = UnityEngine.Vector3;
 
 public class PlayerFlyingMovement : MonoBehaviour
 {
@@ -11,10 +15,12 @@ public class PlayerFlyingMovement : MonoBehaviour
     private Vector3 _lastCameraRightDirection;
     private Vector3 _lastCameraUpDirection;
 
-    private bool _isFreeLooking;
+    public bool IsFreeLooking;
 
     [Header("Movement")] 
-    [SerializeField] private float maxSpeed;
+    [SerializeField] private float maxHorizontalSpeed = 10f;
+    [SerializeField] private float maxVerticalSpeed = 5f;
+
     [SerializeField] private float forwardAcceleration = 15f;
     [SerializeField] private float backwardAcceleration = 8f;
     [SerializeField] private float strafeAcceleration = 10f;
@@ -31,6 +37,24 @@ public class PlayerFlyingMovement : MonoBehaviour
     [SerializeField] private float swayFrequency = 3f;   
     [SerializeField] private float transitionSpeed = 5f; 
     
+    [Header("Stun")]
+    [SerializeField] private float stunDuration = 1f;
+    [SerializeField] private float stunSpeedThreshold = 6f;
+    private float _currentStunTime;
+    private Vector3 _stunDirection;
+    private Vector3 _previousVelocity;
+    private bool _isStunned;
+
+    public bool IsStunned
+    {
+        get => _isStunned;
+        set
+        {
+            _isStunned = value;
+            StunnedEvent?.Invoke(_isStunned);
+        }
+    }
+    
     private float _currentBobAmplitude;
     private float _currentBobFrequency;
     private float _currentSwayAmplitude;
@@ -43,10 +67,8 @@ public class PlayerFlyingMovement : MonoBehaviour
     private Rigidbody _rigidbody;
     
     // Events
-    public static event Action<float> OnHorizontalInputChange;
-    public static event Action<float> OnForwardsInputChange;
-    public static event Action<float> OnVerticalInputChange;
-    
+    public static event Action<Vector3> RigidBodyVelocityChange;
+    public static event Action<bool> StunnedEvent;
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -80,17 +102,27 @@ public class PlayerFlyingMovement : MonoBehaviour
             Debug.Break();
         }
 
-        GetInput();
-        HandleRotation();
-        HandleFreeLooking();
+        // Store previous velocity as this happens after OnCollisionEnter
+        _previousVelocity = _rigidbody.linearVelocity;
+        
+        if (!IsStunned)
+        {
+            GetInput();
+            HandleRotation();
+            HandleFreeLooking();
+        }
         ApplyBuzzing();
     }
 
     private void FixedUpdate()
     {
-        HandleAdvancedMovement();
-        ApplyDrag();
-        ClampVelocity();
+        if (!IsStunned)
+        {
+            HandleAdvancedMovement();
+            ApplyDrag();
+            ClampVelocity();
+        }
+        DebugOutputSpeed();
     }
     
     void GetInput()
@@ -117,7 +149,7 @@ public class PlayerFlyingMovement : MonoBehaviour
 
     private Vector3 GetRelativeForceDirection(Vector3 force)
     {
-        if (_isFreeLooking)
+        if (IsFreeLooking)
         {
             return force.x * _lastCameraRightDirection+
                    force.y * _lastCameraUpDirection +
@@ -153,14 +185,18 @@ public class PlayerFlyingMovement : MonoBehaviour
     
     private void ClampVelocity()
     {
-        // Separate clamping for horizontal and vertical if needed
-        var horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0f, _rigidbody.linearVelocity.z);
-        
-        if (horizontalVelocity.magnitude > maxSpeed)
+        var horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0, _rigidbody.linearVelocity.z);
+        var verticalVelocity = new Vector3(0, _rigidbody.linearVelocity.y, 0);
+    
+        // Clamp horizontal speed
+        if (horizontalVelocity.magnitude > maxHorizontalSpeed)
         {
-            horizontalVelocity = horizontalVelocity.normalized * maxSpeed;
-            _rigidbody.linearVelocity = new Vector3(horizontalVelocity.x, _rigidbody.linearVelocity.y, horizontalVelocity.z);
+            horizontalVelocity = horizontalVelocity.normalized * maxHorizontalSpeed;
         }
+    
+        // Clamp vertical speed separately
+        verticalVelocity = Vector3.ClampMagnitude(verticalVelocity, maxVerticalSpeed);
+        _rigidbody.linearVelocity = horizontalVelocity + verticalVelocity;
     }
     
     private void HandleFreeLooking()
@@ -170,18 +206,52 @@ public class PlayerFlyingMovement : MonoBehaviour
             _lastCameraForwardDirection = freeLookCamera.transform.forward.normalized;
             _lastCameraRightDirection = freeLookCamera.transform.right.normalized;
             _lastCameraUpDirection = freeLookCamera.transform.up.normalized;
-            _isFreeLooking = true;
+            IsFreeLooking = true;
         }
 
         if (Input.GetMouseButtonUp(1))
         {
-            _isFreeLooking = false;
+            IsFreeLooking = false;
         }
     }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (!(_previousVelocity.magnitude >= stunSpeedThreshold)) return;
+        if (Physics.Raycast(transform.position, _previousVelocity, out var hit, 1f,
+                LayerMask.GetMask("Environment")))
+        {
+            var normal = collision.contacts[0].normal;
+            _stunDirection = Vector3.Reflect(_previousVelocity, normal);
+        }
+        IsStunned = true;
+        IsFreeLooking = false;
+        _rigidbody.linearVelocity = Vector3.zero;
+        StartCoroutine(StunCoroutine());
+    }
+
+    private IEnumerator StunCoroutine()
+    {
+        var startPos = transform.position;
+        var endPos = startPos + _stunDirection.normalized;
+        var cTime = 0f;
+
+        
+        while (cTime < stunDuration)
+        {
+            cTime += Time.deltaTime;
+            var step = cTime / stunDuration;
+            transform.position = Vector3.Lerp(startPos, endPos, step); 
+            yield return null;
+        }
+
+        IsStunned = false;
+    }
+    #region Rotation
     
     private void HandleRotation()
     {
-        if (_isFreeLooking)
+        if (IsFreeLooking)
         {
             return;
         }
@@ -199,7 +269,10 @@ public class PlayerFlyingMovement : MonoBehaviour
     {
         model.rotation = Quaternion.LookRotation(transform.forward, transform.up);
     }
+    
+    #endregion
 
+    #region Effects
     private void ApplyBuzzing()
     {
         if (!model)
@@ -219,4 +292,14 @@ public class PlayerFlyingMovement : MonoBehaviour
         
         model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
     }
+    #endregion
+
+    #region Debug
+
+    private void DebugOutputSpeed()
+    {
+        RigidBodyVelocityChange?.Invoke(_rigidbody.linearVelocity);
+    }
+
+    #endregion
 }

@@ -3,29 +3,15 @@ using UnityEngine;
 
 public class DebugInterface : MonoBehaviour
 {
-    [SerializeField] private TMP_Text  horizontalInput;
-    [SerializeField] private TMP_Text  forwardsInput;
-    [SerializeField] private TMP_Text  verticalInput;
+    [SerializeField] private TMP_Text  velocityInput;
 
     private void Start()
     {
-        PlayerFlyingMovement.OnHorizontalInputChange += UpdateHorizontalMovementText;
-        PlayerFlyingMovement.OnForwardsInputChange += UpdateForwardsMovementText;
-        PlayerFlyingMovement.OnVerticalInputChange += UpdateVerticalMovementText;
+        PlayerFlyingMovement.RigidBodyVelocityChange += UpdateVelocityText;
     }
 
-    private void UpdateHorizontalMovementText(float input)
+    private void UpdateVelocityText(Vector3 input)
     {
-        horizontalInput.text = $"horz: {input:F2}";
-    }
-    
-    private void UpdateForwardsMovementText(float input)
-    {
-        horizontalInput.text = $"forw: {input:F2}";
-    }
-    
-    private void UpdateVerticalMovementText(float input)
-    {
-        horizontalInput.text = $"vert: {input:F2}";
+        velocityInput.text = $"X: {input.x:F1}, Y: {input.y:F1}, Z: {input.z:F1}";
     }
 }

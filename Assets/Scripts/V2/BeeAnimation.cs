@@ -3,6 +3,8 @@ using UnityEngine.Animations.Rigging;
 
 public class BeeAnimation : MonoBehaviour
 {
+    public Transform FreeLookingPole;
+    public Transform FreeLookingTarget;
     public static BeeAnimation Instance;
     private Animator _animator;
     [SerializeField] 
@@ -18,9 +20,27 @@ public class BeeAnimation : MonoBehaviour
         
         Instance = this;
         
-        _animator =  GetComponent<Animator>();
+        _animator = GetComponent<Animator>();
+        PlayerFlyingMovement.StunnedEvent += Stun;
     }
 
+    void Update()
+    {
+        FreeLookingTarget.position = PlayerFlyingMovement.Instance.IsFreeLooking 
+            ? FreeLookingPole.position
+            : transform.position;
+    }
+
+    private void Stun(bool state)
+    {
+        if (!state)
+        {
+            return;
+        }
+        
+        _animator.SetTrigger("Stun");
+    }
+    
     public void PickUp()
     {
         _animator.SetTrigger("Pick Up");
