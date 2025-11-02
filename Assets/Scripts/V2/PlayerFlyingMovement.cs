@@ -14,7 +14,8 @@ public class PlayerFlyingMovement : MonoBehaviour
     private Vector3 _lastCameraForwardDirection;
     private Vector3 _lastCameraRightDirection;
     private Vector3 _lastCameraUpDirection;
-
+    
+    [HideInInspector]
     public bool IsFreeLooking;
 
     [Header("Movement")] 
