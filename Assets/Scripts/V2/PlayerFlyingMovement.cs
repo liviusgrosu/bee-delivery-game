@@ -95,8 +95,6 @@ public class PlayerFlyingMovement : MonoBehaviour
     
     private void Update()
     {
-        Debug.DrawRay(transform.position, transform.forward, Color.red);
-
         if (Input.GetKey(KeyCode.T))
         {
             Debug.Break();
