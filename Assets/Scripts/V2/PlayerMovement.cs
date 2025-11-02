@@ -60,6 +60,7 @@ public class PlayerMovement : MonoBehaviour
         }
         
         var (hitSomething, hit) = GetGroundedState();
+        return;
         if (hitSomething)
         {
             IsGrounded = true;

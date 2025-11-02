@@ -4,7 +4,7 @@ using UnityEngine;
 public class PickUpPackage : MonoBehaviour
 {
     public static PickUpPackage Instance;
-    
+    [SerializeField] private Transform packageClampPosition;
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
 
@@ -35,7 +35,11 @@ public class PickUpPackage : MonoBehaviour
                     packageComponent.PickUp();
                 }
                 
-                _pickedUpItem.parent = transform;
+                _pickedUpItem.parent = packageClampPosition;
+                _pickedUpItem.position = packageClampPosition.position;
+                // Provided that the model has a Vector3.eular rotation of Vector3.zero
+                _pickedUpItem.rotation = packageClampPosition.rotation;
+
                 //_pickedUpItem.position = transform.position;
             }
             
