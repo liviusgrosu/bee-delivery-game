@@ -19486,7 +19486,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.28896832, y: 0.23828325, z: 0.4186678}
   m_Center: {x: 0.0019909143, y: 0.022894934, z: 0.0019907951}
---- !u!114 &1212884872
+--- !u!114 &1212884874
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -19495,13 +19495,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 1212884866}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ef58af711ea6cf48ba3d65ba44168a2, type: 3}
+  m_Script: {fileID: 11500000, guid: 1a5bbc917843012418bc6973c2b1fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _minWeight: 1
-  _maxWeight: 1
-  Weight: 1
-  PayOut: 1
+  Health: 100
+  _rigidBody: {fileID: 0}
+  _collider: {fileID: 0}
+  _currentSpeed: 0
 --- !u!1 &1219398913
 GameObject:
   m_ObjectHideFlags: 0
@@ -21608,7 +21608,7 @@ PrefabInstance:
       addedObject: {fileID: 1212884869}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1212884872}
+      addedObject: {fileID: 1212884874}
   m_SourcePrefab: {fileID: 100100000, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
 --- !u!1001 &1813014208
 PrefabInstance:

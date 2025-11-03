@@ -214,15 +214,15 @@ public class PlayerFlyingMovement : MonoBehaviour
         }
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision other)
     {
-        if (!(_previousVelocity.magnitude >= stunSpeedThreshold)) return;
-        if (Physics.Raycast(transform.position, _previousVelocity, out var hit, 1f,
-                LayerMask.GetMask("Environment")))
+        if (!(_previousVelocity.magnitude >= stunSpeedThreshold) ||
+            other.gameObject.layer != LayerMask.NameToLayer("Environment"))
         {
-            var normal = collision.contacts[0].normal;
-            _stunDirection = Vector3.Reflect(_previousVelocity, normal);
+            return;
         }
+        var normal = other.contacts[0].normal;
+        _stunDirection = Vector3.Reflect(_previousVelocity, normal);
         IsStunned = true;
         IsFreeLooking = false;
         _rigidbody.linearVelocity = Vector3.zero;
