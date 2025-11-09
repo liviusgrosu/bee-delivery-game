@@ -28,7 +28,7 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private void Start()
     {
-        GameManagerV1.JobInProgress += ToggleJob;
+        GameManager.JobInProgress += ToggleJob;
     }
 
     public void Init()
@@ -79,7 +79,7 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         StartButton.interactable = false;
         StartButtonText.text = "Delivering";
         
-        GameManagerV1.Instance.AssignJob(
+        GameManager.Instance.AssignJob(
             _orderData.Pickup, 
             _orderData.Dropoff, 
             _orderData.Pay,

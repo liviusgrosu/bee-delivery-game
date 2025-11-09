@@ -1,11 +1,9 @@
 using System;
-using DefaultNamespace;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public class GameManagerV1 : MonoBehaviour
+public class GameManager : MonoBehaviour
 {
-    public static GameManagerV1 Instance { get; private set; }
+    public static GameManager Instance { get; private set; }
 
     [SerializeField]
     private int _packageGoal = 1;
