@@ -40,7 +40,7 @@ public class PackagePickupController : MonoBehaviour
     private void PickUpPackage()
     {
         _pickedUpItem =  _potentialPickUpItem;
-        var packageComponent = _pickedUpItem.GetComponent<PackageV2>();
+        var packageComponent = _pickedUpItem.GetComponent<Package>();
                 
         if (packageComponent)
         {
@@ -51,7 +51,7 @@ public class PackagePickupController : MonoBehaviour
             packageComponent.PickUp();
         }
         
-        GameManagerV1.Instance.PickedUpPackage();
+        GameManager.Instance.PickedUpPackage();
         BeeAnimation.Instance.PickUp();
                         
         _pickedUpItem.parent = packageClampPosition;
@@ -72,7 +72,7 @@ public class PackagePickupController : MonoBehaviour
     private void DropPackage()
     {
         BeeAnimation.Instance.DropOff();
-        var package = _pickedUpItem.GetComponent<PackageV2>();
+        var package = _pickedUpItem.GetComponent<Package>();
                 
         if (package)
         {

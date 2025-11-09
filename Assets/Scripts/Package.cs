@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class PackageV2 : MonoBehaviour
+public class Package : MonoBehaviour
 {
     public float Health;
     public MeshRenderer _boxRenderer;

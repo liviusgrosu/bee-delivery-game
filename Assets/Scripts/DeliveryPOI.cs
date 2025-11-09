@@ -24,7 +24,7 @@ public class DeliveryPOI : MonoBehaviour
     
     public void Init(bool state, float payout = 0f)
     {
-        var animalList = GameManagerV1.Instance.AnimalList;
+        var animalList = GameManager.Instance.AnimalList;
         var selectedAnimal = animalList[Random.Range(0, animalList.Length)];
         var animalPrefab = Resources.Load<GameObject>($"{AnimalResourceFolder}/{selectedAnimal}");
         _animalInstance = Instantiate(animalPrefab, AnimalSpawn.position, AnimalSpawn.rotation);
@@ -34,7 +34,7 @@ public class DeliveryPOI : MonoBehaviour
         if (state)
         {
             var package = Instantiate(packagePrefab, PackageSpawn.position, PackageSpawn.rotation);
-            package.GetComponent<PackageV2>().PayOut = payout;
+            package.GetComponent<Package>().PayOut = payout;
         }
         
         _collider.enabled = !state;
@@ -51,15 +51,15 @@ public class DeliveryPOI : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (GameManagerV1.Instance.DeliveringPackage &&
+        if (GameManager.Instance.DeliveringPackage &&
             !PackagePickupController.Instance.IsHoldingPackage && 
             other.transform.CompareTag("Package"))
         {
-            var package = other.GetComponent<PackageV2>();
+            var package = other.GetComponent<Package>();
             package.Interactable = false;
             Destroy(other.gameObject, 10f);
             Disable();
-            GameManagerV1.Instance.DeliveredPackage(package.PayOut);
+            GameManager.Instance.DeliveredPackage(package.PayOut);
         }
     }
 }
