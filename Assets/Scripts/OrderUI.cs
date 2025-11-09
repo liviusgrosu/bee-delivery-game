@@ -91,6 +91,8 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         StartButtonText.text = "Completed";
         _inProgress = false;
         _completed = true;
+        DropOffSymbol.gameObject.SetActive(false);
+        PickUpSymbol.gameObject.SetActive(false);
     }
 
     public void ToggleJob(bool state)
