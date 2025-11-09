@@ -9,7 +9,9 @@ public class PackageV2 : MonoBehaviour
     private float _currentSpeed;
     private bool _takenDamage;
     public PackageConditions[] PackageConditions;
-
+    public bool Interactable = true;
+    public float PayOut = 1f;
+    
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();

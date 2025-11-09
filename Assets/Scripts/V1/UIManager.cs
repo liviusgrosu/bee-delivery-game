@@ -10,8 +10,6 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI PickUpText;
     public TextMeshProUGUI PayText;
     public TextMeshProUGUI DeliveredPackagesText;
-    public TextMeshProUGUI OpenInstructionsText;
-    public TextMeshProUGUI GoBackHomeText;
 
     public Transform PoiParent;
     public Dictionary<string, RectTransform> PoiList;
@@ -67,10 +65,6 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (OpenInstructionsText.enabled)
-            {
-                OpenInstructionsText.enabled = false;
-            }
             switch (CurrentMenu)
             {
                 case  MenuState.InGame:

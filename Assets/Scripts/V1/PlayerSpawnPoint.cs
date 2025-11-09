@@ -26,7 +26,7 @@ namespace DefaultNamespace
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.CompareTag("Player") && GameManager.Instance.IsDoneLevel)
+            if (other.gameObject.CompareTag("Player") && GameManagerV1.Instance.IsDoneLevel)
             {
                 UIManager.Instance.TriggerGameWinScreen();
             }

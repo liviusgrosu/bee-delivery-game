@@ -10,7 +10,7 @@ public class Goal :  MonoBehaviour
         {
             var pay = collision.gameObject.GetComponent<Package>().PayOut;
             PlayerSoundPlayer.Instance.PackageDeliveredSound();
-            GameManager.Instance.DeliveredPackage(pay);
+            GameManagerV1.Instance.DeliveredPackage(pay);
             IsCurrentGoal = false;
             Destroy(collision.gameObject);
         }
