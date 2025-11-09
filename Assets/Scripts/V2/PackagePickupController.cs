@@ -7,6 +7,7 @@ public class PackagePickupController : MonoBehaviour
     [SerializeField] private Transform packageClampPosition;
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
+    public bool IsHoldingPackage => _pickedUpItem != null;
 
     private void Awake()
     {
@@ -38,16 +39,21 @@ public class PackagePickupController : MonoBehaviour
 
     private void PickUpPackage()
     {
-        BeeAnimation.Instance.PickUp();
-                
         _pickedUpItem =  _potentialPickUpItem;
         var packageComponent = _pickedUpItem.GetComponent<PackageV2>();
                 
         if (packageComponent)
         {
+            if (!packageComponent.Interactable)
+            {
+                return;
+            }
             packageComponent.PickUp();
         }
-                
+        
+        GameManagerV1.Instance.PickedUpPackage();
+        BeeAnimation.Instance.PickUp();
+                        
         _pickedUpItem.parent = packageClampPosition;
         _pickedUpItem.position = packageClampPosition.position;
         // Provided that the model has a Vector3.eular rotation of Vector3.zero

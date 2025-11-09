@@ -3,11 +3,14 @@ using UnityEngine;
 
 public class PickUp : MonoBehaviour
 {
+    public static PickUp Instance;
+    
     private Transform _potentialPickUpItem;
     public Transform PickedUpItem;
     
-    public float CurrentWeight = 1f;
+    public bool IsHoldingPackage => PickedUpItem != null;
     
+    public float CurrentWeight = 1f;
 
     private void Start()
     {
@@ -28,7 +31,7 @@ public class PickUp : MonoBehaviour
                     package.PickUp();
 
                     PlayerSoundPlayer.Instance.PackagePickUpSound();
-                    GameManager.Instance.PickedUpPackage();
+                    GameManagerV1.Instance.PickedUpPackage();
                     
                     CurrentWeight = package.Weight;
                 }
@@ -36,7 +39,6 @@ public class PickUp : MonoBehaviour
                 PickedUpItem.parent = transform;
                 PickedUpItem.position = transform.position;
                 
-                UIManager.Instance.PickUpText.text = "Press 'F' to drop";
             }
             
             else if (PickedUpItem)

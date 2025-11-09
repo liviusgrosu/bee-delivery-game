@@ -16,8 +16,6 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     private TextMeshProUGUI _pickUpText;
     [SerializeField]
     private TextMeshProUGUI _payText;
-    [SerializeField]
-    private TextMeshProUGUI _weightText;
     
     public Button StartButton;
     public TextMeshProUGUI StartButtonText;
@@ -30,7 +28,7 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     private void Start()
     {
-        GameManager.JobInProgress += ToggleJob;
+        GameManagerV1.JobInProgress += ToggleJob;
     }
 
     public void Init()
@@ -38,7 +36,6 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         _dropOffText.text = $"Drop Off: {_orderData.Dropoff}";
         _pickUpText.text = $"Pick Up: {_orderData.Pickup}";
         _payText.text = $"Pay: ${_orderData.Pay}";
-        _weightText.text = $"Weight: {_orderData.Weight} Kg";
         
         var dropOffPos = UIManager.Instance.PoiList[_orderData.Dropoff];
         var pickUpPos = UIManager.Instance.PoiList[_orderData.Pickup];
@@ -82,10 +79,9 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         StartButton.interactable = false;
         StartButtonText.text = "Delivering";
         
-        GameManager.Instance.AssignJob(
+        GameManagerV1.Instance.AssignJob(
             _orderData.Pickup, 
             _orderData.Dropoff, 
-            _orderData.Weight, 
             _orderData.Pay,
             FinishedJob);
     }

@@ -1,21 +1,10 @@
 using System;
-using System.Collections.Generic;
 using DefaultNamespace;
-using TMPro;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
-public struct CurrentJob
+public class GameManagerV2 : MonoBehaviour
 {
-    private string pickupLocation;
-    private string dropOffLocation;
-    private float wieght;
-    private float pay;
-}
-
-public class GameManager : MonoBehaviour
-{
-    public static GameManager Instance { get; private set; }
+    public static GameManagerV2 Instance { get; private set; }
 
     [SerializeField]
     private int _packageGoal = 1;
@@ -106,7 +95,6 @@ public class GameManager : MonoBehaviour
             PackageMarker.GetComponent<Bobbing>().enabled = false;
             PackageMarker.transform.position = PlayerSpawn.position + new Vector3(0, 2f, 0);
             PackageMarker.GetComponent<Bobbing>().enabled = true;
-            UIManager.Instance.GoBackHomeText.gameObject.SetActive(true);
         }
     }
 
