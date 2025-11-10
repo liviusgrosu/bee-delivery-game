@@ -7,4 +7,6 @@ public class OrderData : ScriptableObject
     public string Dropoff;
     public float Pay;
     public float Weight;
+    public float Tip;
+    public float PackageHealth;
 }

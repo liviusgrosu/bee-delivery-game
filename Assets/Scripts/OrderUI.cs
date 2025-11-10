@@ -81,8 +81,10 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         
         GameManager.Instance.AssignJob(
             _orderData.Pickup, 
-            _orderData.Dropoff, 
+            _orderData.Dropoff,
+            _orderData.PackageHealth,
             _orderData.Pay,
+            _orderData.Tip,
             FinishedJob);
     }
 

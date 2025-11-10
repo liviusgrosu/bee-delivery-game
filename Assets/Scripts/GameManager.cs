@@ -42,17 +42,17 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         UIManager.Instance.DeliveredPackagesText.text = $"Packages Delivered: {PackagesDelivered}/{_packageGoal}";
-        UIManager.Instance.PayText.text = $"Pay: ${Paid}";
+        UIManager.Instance.PayText.text = $"Pay: {Paid:C}";
     }
 
-    public void AssignJob(string start, string end, float pay, Action onJobComplete)
+    public void AssignJob(string start, string end, float packageHealth, float pay, float tip, Action onJobComplete)
     {
         JobInProgress?.Invoke(false);
         
         _onJobComplete = onJobComplete;
         _currentPickupPoint = DeliveryPoints.Find(start);
         _currentDropoffPoint = DeliveryPoints.Find(end);
-        _currentPickupPoint.GetComponent<DeliveryPOI>().Init(true, pay);
+        _currentPickupPoint.GetComponent<DeliveryPOI>().Init(true, packageHealth, pay, tip);
         DeliveringPackage = false;
     }
 
@@ -66,16 +66,15 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void DeliveredPackage(float payOut)
+    public void DeliveredPackage(float payOut, float totalTip)
     {
         DeliveringPackage = false;
         PackagesDelivered++;
         JobInProgress?.Invoke(true);
         _onJobComplete?.Invoke();
         _onJobComplete = null;
-        Paid += payOut;
+        Paid += payOut + totalTip;
+        DeliveryResultUI.Instance.Display(payOut, totalTip);
         UIManager.Instance.DeliveredPackagesText.text = $"Packages Delivered: {PackagesDelivered}/{_packageGoal}";
-        UIManager.Instance.PayText.text = $"Pay: ${Paid}";
-        
     }
 }
