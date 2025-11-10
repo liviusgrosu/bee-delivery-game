@@ -216,8 +216,8 @@ public class PlayerFlyingMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (!(_previousVelocity.magnitude >= stunSpeedThreshold) ||
-            other.gameObject.layer != LayerMask.NameToLayer("Environment"))
+        if (!(_previousVelocity.magnitude >= stunSpeedThreshold) /*||
+            other.gameObject.layer != LayerMask.NameToLayer("Environment")*/)
         {
             return;
         }
