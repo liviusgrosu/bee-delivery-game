@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class Package : MonoBehaviour
 {
-    public float Health;
+    public float _currentHealth;
+    public float MaxHP;
     public MeshRenderer _boxRenderer;
     private Rigidbody _rigidBody;
     private Collider _collider;
@@ -11,11 +12,17 @@ public class Package : MonoBehaviour
     public PackageConditions[] PackageConditions;
     public bool Interactable = true;
     public float PayOut = 1f;
+    public float PotentialTip = 0f;
     
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
+    }
+
+    public void SetHealth(float hp)
+    {
+        MaxHP = _currentHealth = hp;
     }
     
     private void Update()
@@ -34,8 +41,8 @@ public class Package : MonoBehaviour
             return;
         }
         _takenDamage = true;
-        Health -= _currentSpeed;
-        if (Health <= 0)
+        _currentHealth -= _currentSpeed;
+        if (_currentHealth <= 0)
         {
             Destroy(gameObject);
         }
@@ -46,7 +53,7 @@ public class Package : MonoBehaviour
     {
         foreach(var condition in PackageConditions)
         {
-            if (Health <= condition.Health)
+            if (_currentHealth <= condition.Health)
             {
                 _boxRenderer.material = condition.Material;
                 continue;
@@ -67,5 +74,10 @@ public class Package : MonoBehaviour
         _rigidBody.useGravity = true;
         _rigidBody.isKinematic = false;
         _collider.enabled = true;
+    }
+
+    public float GetHealthPercentage()
+    {
+        return _currentHealth / MaxHP;
     }
 }

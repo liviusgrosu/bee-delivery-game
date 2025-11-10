@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-using System.IO.IsolatedStorage;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;

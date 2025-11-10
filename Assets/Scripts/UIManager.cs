@@ -6,7 +6,19 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
+
+    private float _currentPay;
     
+    // For UI effect only
+    public float CurrentUIPay
+    {
+        get => _currentPay;
+        set
+        {
+            _currentPay = value;
+            PayText.text = $"Pay: {_currentPay:C}";
+        }
+    }
     public TextMeshProUGUI PickUpText;
     public TextMeshProUGUI PayText;
     public TextMeshProUGUI DeliveredPackagesText;
