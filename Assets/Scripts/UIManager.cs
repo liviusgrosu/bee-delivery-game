@@ -6,12 +6,22 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance;
+
+    private float _currentPay;
     
+    // For UI effect only
+    public float CurrentUIPay
+    {
+        get => _currentPay;
+        set
+        {
+            _currentPay = value;
+            PayText.text = $"Pay: {_currentPay:C}";
+        }
+    }
     public TextMeshProUGUI PickUpText;
     public TextMeshProUGUI PayText;
     public TextMeshProUGUI DeliveredPackagesText;
-    public TextMeshProUGUI OpenInstructionsText;
-    public TextMeshProUGUI GoBackHomeText;
 
     public Transform PoiParent;
     public Dictionary<string, RectTransform> PoiList;
@@ -67,10 +77,6 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            if (OpenInstructionsText.enabled)
-            {
-                OpenInstructionsText.enabled = false;
-            }
             switch (CurrentMenu)
             {
                 case  MenuState.InGame:

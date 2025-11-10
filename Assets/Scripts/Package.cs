@@ -2,34 +2,82 @@ using UnityEngine;
 
 public class Package : MonoBehaviour
 {
-    [SerializeField]
-    private float _minWeight = 1f;
-    [SerializeField]
-    private float _maxWeight = 1f;
-
-    public float Weight = 1f;
+    public float _currentHealth;
+    public float MaxHP;
+    public MeshRenderer _boxRenderer;
+    private Rigidbody _rigidBody;
+    private Collider _collider;
+    private float _currentSpeed;
+    private bool _takenDamage;
+    public PackageConditions[] PackageConditions;
+    public bool Interactable = true;
     public float PayOut = 1f;
-    
-    private Rigidbody _rb;
-    private Collider _col;
+    public float PotentialTip = 0f;
     
     private void Awake()
     {
-        _rb = GetComponent<Rigidbody>();
-        _col = GetComponent<Collider>();
+        _rigidBody = GetComponent<Rigidbody>();
+        _collider = GetComponent<Collider>();
     }
 
+    public void SetHealth(float hp)
+    {
+        MaxHP = _currentHealth = hp;
+    }
+    
+    private void Update()
+    {
+        _currentSpeed = _rigidBody.linearVelocity.magnitude;
+        if (Mathf.Approximately(_currentSpeed, 0f))
+        {
+            _takenDamage = false;
+        }
+    }
+    
+    public void OnCollisionEnter(Collision other)
+    {
+        if (_takenDamage || other.gameObject.layer != LayerMask.NameToLayer("Environment"))
+        {
+            return;
+        }
+        _takenDamage = true;
+        _currentHealth -= _currentSpeed;
+        if (_currentHealth <= 0)
+        {
+            Destroy(gameObject);
+        }
+        UpdateCondition();
+    }
+
+    private void UpdateCondition()
+    {
+        foreach(var condition in PackageConditions)
+        {
+            if (_currentHealth <= condition.Health)
+            {
+                _boxRenderer.material = condition.Material;
+                continue;
+            }
+            return;
+        }
+    }
+    
     public void PickUp()
     {
-        _rb.useGravity = false;
-        _rb.isKinematic = true;
-        _col.enabled = false;
+        _rigidBody.useGravity = false;
+        _rigidBody.isKinematic = true;
+        _collider.enabled = false;
     }
 
     public void DropOff()
     {
-        _rb.useGravity = true;
-        _rb.isKinematic = false;
-        _col.enabled = true;
+        _rigidBody.useGravity = true;
+        _rigidBody.isKinematic = false;
+        _collider.enabled = true;
+    }
+
+    public float GetHealthPercentage()
+    {
+        return _currentHealth / MaxHP;
     }
 }

@@ -1,31 +1,28 @@
-using System;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+
+public class CustomRaycastHit
+{
+    public Collider Collider { get; set; }
+    public Vector3 Point { get; set; }
+    public Vector3 Normal { get; set; }
+    public float Distance { get; set; }
+}
 
 public class PlayerMovement : MonoBehaviour
 {
-    public static PlayerMovement Instance { get; private set; }
+    public static PlayerMovement Instance;
+    protected bool IsGrounded;
+    private bool IsTakingOff;
 
-    [Header("Movement")]
-    public float MaxSpeed = 5f;
-    public float Acceleration = 10f;
-    public float Drag = 5f;
-    public float SprintMultiplier = 5f;
-
-    [HideInInspector]
-    public bool IsSprinting;
-    private float _currentSpeed;
+    [Tooltip("Radius of collider sphere")]
+    [SerializeField] 
+    protected float colliderCheckRadius = 0.35f;
     
-    [Header("Mouse")]
-    public float MouseSensitivityX = 5f;
-    public float MouseSensitivityY = 5f;
-    
-    private Rigidbody _rb;
-    private Vector3 _input;
-    private float _yaw;
-    private float _pitch;
+    protected int EnvironmentMask;
 
-    public PickUp PickUp;
-    public float CarryCapacity = 2f;
+    private BeeFlappingAnimation flappingAnimation;
     
     private void Awake()
     {
@@ -36,49 +33,117 @@ public class PlayerMovement : MonoBehaviour
         }
         
         Instance = this;
-        
-        _rb = GetComponent<Rigidbody>();
-        _rb.linearDamping = Drag;
+        flappingAnimation = GetComponentInChildren<BeeFlappingAnimation>();
     }
-    
-    void Update()
+
+    private void Start()
     {
-        if (UIManager.Instance.CurrentMenu == UIManager.MenuState.JobList)
+        EnvironmentMask = LayerMask.GetMask("Environment");
+    }
+
+    private void Update()
+    {
+        // Check to see if the player hits a wall or ground
+        // If so, then we need to trigger the landing animation
+        if (IsTakingOff)
         {
             return;
         }
         
-        var mouseX = Input.GetAxis("Mouse X");
-        var mouseY =  Input.GetAxis("Mouse Y");
-        _yaw += mouseX * MouseSensitivityX;
-        _pitch += mouseY * MouseSensitivityY;
+        if (IsGrounded)
+        {
+            if (Input.GetKey(KeyCode.Space))
+            {
+                StartCoroutine(TakeOff());
+            }
+            return;
+        }
         
-        _pitch = Mathf.Clamp(_pitch, -75, 75);
-        
-        transform.rotation = Quaternion.Euler(-_pitch, _yaw, 0);
-        
-        // Get movement input from WASD/Arrow keys
-        IsSprinting = Input.GetKey(KeyCode.Mouse0);
-        var speed = IsSprinting ? SprintMultiplier * MaxSpeed : MaxSpeed;
-        float horizontal = Input.GetAxisRaw("Horizontal");
-        float vertical = Input.GetAxisRaw("Vertical");
-        float upInput = Input.GetKey(KeyCode.Space) ? 1 : 0;
-        float downInput = Input.GetKey(KeyCode.LeftShift) ? -1 : 0;
-        var combinedUpDown = upInput + downInput;
+        var (hitSomething, hit) = GetGroundedState();
+        return;
+        if (hitSomething)
+        {
+            IsGrounded = true;
+            flappingAnimation.enabled = false;
 
-        var weightForce = Mathf.Clamp(PickUp.CurrentWeight / CarryCapacity, 1f, Mathf.Infinity);
-        speed /= weightForce;
-        
-        var moveInput = new Vector3(horizontal * speed, combinedUpDown * speed, vertical * speed);
-        _input = transform.TransformDirection(moveInput);
+            PlayerFlyingMovement.Instance.ResetModelRotation();
+            
+            PlayerFlyingMovement.Instance.enabled = false;
+            PlayerWalkingMovement.Instance.enabled = true;
+        }
     }
     
-    void FixedUpdate()
+    protected (bool, CustomRaycastHit) GetGroundedState()
     {
-        if (_input.magnitude > 0.1f)
+        // Init
+        var closest = new CustomRaycastHit
         {
-            Vector3 velocityChange = (_input - _rb.linearVelocity);
-            _rb.AddForce(velocityChange * Acceleration, ForceMode.Acceleration);
+            Distance = Mathf.Infinity
+        };
+        var hitSomething = false;
+        var hits = GetOverlappingHits();
+
+        foreach (var hit in hits)
+        {
+            if (hit.Distance < closest.Distance)
+            {
+                closest = hit;
+            }
+            hitSomething = true;
         }
+        
+        return (hitSomething, closest);
+    }
+    
+    private List<CustomRaycastHit> GetOverlappingHits()
+    {
+        var overlappingColliders = new Collider[5];
+        var hitCount = Physics.OverlapSphereNonAlloc(
+            transform.position, 
+            colliderCheckRadius, 
+            overlappingColliders, 
+            EnvironmentMask);
+
+        var rayCasts = new List<CustomRaycastHit>();
+
+        for (var i = 0; i < hitCount; i++)
+        {
+            var rayCast = new CustomRaycastHit
+            {
+                Collider = overlappingColliders[i]
+            };
+
+            rayCast.Point = rayCast.Collider.ClosestPoint(transform.position);
+            rayCast.Normal = (transform.position - rayCast.Point).normalized;
+            rayCast.Distance = (transform.position - (rayCast.Point + rayCast.Normal * 0.25f)).magnitude;
+            
+            rayCasts.Add(rayCast);
+        }
+        
+        return rayCasts;
+    }
+
+    private IEnumerator TakeOff()
+    {
+        const float duration = 0.1f;
+        var elapsed = 0f;
+
+        var currentPos = transform.position;
+        var finalPos = transform.position + PlayerWalkingMovement.Instance.RelativeUp;
+        
+        PlayerWalkingMovement.Instance.enabled = false;
+        IsTakingOff = true;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            transform.position = Vector3.Slerp(currentPos, finalPos, elapsed / duration);
+            yield return null;
+        }
+
+        PlayerFlyingMovement.Instance.enabled = true;
+        flappingAnimation.enabled = true;
+        IsGrounded = false;
+        IsTakingOff = false;
     }
 }
