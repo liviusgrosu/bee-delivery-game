@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 4971543570023027333}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.175, z: 0}
+  m_LocalPosition: {x: 0, y: 0.338, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -113,7 +113,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 4de9d4572aee0ac4abed3e25e0c5b9df, type: 2}
     - target: {fileID: 919132149155446097, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
       propertyPath: m_Name
-      value: Package V2
+      value: Package - Small
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
       propertyPath: m_TagString
@@ -214,6 +214,8 @@ MonoBehaviour:
   _currentHealth: 0
   MaxHP: 0
   _boxRenderer: {fileID: 5197980012385856303}
+  PickUpPoint: {fileID: 4394871551227795373}
+  PickupDistance: {x: 0, y: 0, z: 0}
   PackageConditions:
   - Health: 100
     Material: {fileID: 2100000, guid: 0a6f29446d485f842abcbf166f794aa8, type: 2}

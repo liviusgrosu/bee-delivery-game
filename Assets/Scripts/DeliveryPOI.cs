@@ -22,7 +22,7 @@ public class DeliveryPOI : MonoBehaviour
         _collider = GetComponent<SphereCollider>();
     }
     
-    public void Init(bool state, float packageHealth = 100f, float payout = 0f, float potentialTip = 0f)
+    public void Init(bool state, OrderData orderData=null)
     {
         var animalList = GameManager.Instance.AnimalList;
         var selectedAnimal = animalList[Random.Range(0, animalList.Length)];
@@ -31,12 +31,14 @@ public class DeliveryPOI : MonoBehaviour
         _animalInstance.transform.parent = AnimalSpawn;
         _animalInstance.GetComponent<Animator>().SetTrigger(Active);
 
-        if (state)
+        if (state && orderData)
         {
             var package = Instantiate(packagePrefab, PackageSpawn.position, PackageSpawn.rotation);
-            package.GetComponent<Package>().PayOut = payout;
-            package.GetComponent<Package>().PotentialTip = potentialTip;
-            package.GetComponent<Package>().SetHealth(packageHealth);
+            var comp = package.GetComponent<Package>();
+            comp.PayOut = orderData.Pay;
+            comp.PotentialTip = orderData.Tip;
+            comp.SetHealth(orderData.PackageHealth);
+            comp.CurrentWeight = orderData.Weight;
         }
         
         _collider.enabled = !state;

@@ -45,20 +45,20 @@ public class GameManager : MonoBehaviour
         UIManager.Instance.PayText.text = $"Pay: {Paid:C}";
     }
 
-    public void AssignJob(string start, string end, float packageHealth, float pay, float tip, Action onJobComplete)
+    public void AssignJob(OrderData orderData, Action onJobComplete)
     {
         JobInProgress?.Invoke(false);
         
         _onJobComplete = onJobComplete;
-        _currentPickupPoint = DeliveryPoints.Find(start);
-        _currentDropoffPoint = DeliveryPoints.Find(end);
-        _currentPickupPoint.GetComponent<DeliveryPOI>().Init(true, packageHealth, pay, tip);
+        _currentPickupPoint = DeliveryPoints.Find(orderData.Pickup);
+        _currentDropoffPoint = DeliveryPoints.Find(orderData.Dropoff);
+        _currentPickupPoint.GetComponent<DeliveryPOI>().Init(true, orderData);
         DeliveringPackage = false;
     }
 
     public void PickedUpPackage()
     {
-        if (!DeliveringPackage)
+        if (!DeliveringPackage && _currentPickupPoint && _currentDropoffPoint)
         {
             _currentPickupPoint.GetComponent<DeliveryPOI>().Disable();
             _currentDropoffPoint.GetComponent<DeliveryPOI>().Init(false);

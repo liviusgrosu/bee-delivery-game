@@ -9,15 +9,19 @@ public class Package : MonoBehaviour
     private Collider _collider;
     private float _currentSpeed;
     private bool _takenDamage;
+    public Transform PickUpPoint;
+    public Vector3 PickupDistance;
     public PackageConditions[] PackageConditions;
     public bool Interactable = true;    
     public float PayOut = 1f;
-    public float PotentialTip = 0f;
+    public float PotentialTip;
+    public float CurrentWeight;
     
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
         _collider = GetComponent<Collider>();
+        PickupDistance = transform.position - PickUpPoint.position;
     }
 
     public void SetHealth(float hp)

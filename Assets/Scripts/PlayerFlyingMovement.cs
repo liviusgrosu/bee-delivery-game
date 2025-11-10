@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Quaternion = UnityEngine.Quaternion;
 using Vector3 = UnityEngine.Vector3;
@@ -16,6 +17,8 @@ public class PlayerFlyingMovement : MonoBehaviour
     
     [HideInInspector]
     public bool IsFreeLooking;
+
+    private bool _isCarryingLargePackage;
 
     [Header("Movement")] 
     [SerializeField] private float maxHorizontalSpeed = 10f;
@@ -141,7 +144,14 @@ public class PlayerFlyingMovement : MonoBehaviour
             return;
         }
         var force = CalculateAccelerationForce(_inputDirection);
+        
         var relativeForce = GetRelativeForceDirection(force);
+
+        if (_inputDirection != Vector3.zero)
+        {
+            relativeForce.y += _inputDirection.y * verticalAcceleration;
+        }
+        
         _rigidbody.AddForce(relativeForce, ForceMode.Acceleration);
     }
 
@@ -153,23 +163,27 @@ public class PlayerFlyingMovement : MonoBehaviour
                    force.y * _lastCameraUpDirection +
                    force.z * _lastCameraForwardDirection;
         }
+        
+        var freeLockCamRelativeAxis = freeLookCamera.transform.TransformDirection(force);
+        
+        Debug.DrawRay(transform.position, freeLockCamRelativeAxis, Color.red);
 
-        return freeLookCamera.transform.TransformDirection(force);
+        return freeLockCamRelativeAxis;
     }
     
     private Vector3 CalculateAccelerationForce(Vector3 direction)
     {
+        // Each axis has its own acceleration force
         var accelerationForce = Vector3.zero;
-
         accelerationForce.z = direction.z switch
         {
             > 0 => direction.z * forwardAcceleration,
             < 0 => direction.z * backwardAcceleration,
             _ => accelerationForce.z
         };
-        
         accelerationForce.x = direction.x * strafeAcceleration;
-        accelerationForce.y = direction.y * verticalAcceleration;
+        //accelerationForce.y = direction.y * verticalAcceleration;
+        // Translate this from world space to the transform local space 
         return transform.TransformDirection(accelerationForce);
     }
     
@@ -187,13 +201,13 @@ public class PlayerFlyingMovement : MonoBehaviour
         var verticalVelocity = new Vector3(0, _rigidbody.linearVelocity.y, 0);
     
         // Clamp horizontal speed
-        if (horizontalVelocity.magnitude > maxHorizontalSpeed)
+        if (horizontalVelocity.magnitude > WeightAffectedValue(maxHorizontalSpeed))
         {
-            horizontalVelocity = horizontalVelocity.normalized * maxHorizontalSpeed;
+            horizontalVelocity = horizontalVelocity.normalized * WeightAffectedValue(maxHorizontalSpeed);
         }
     
         // Clamp vertical speed separately
-        verticalVelocity = Vector3.ClampMagnitude(verticalVelocity, maxVerticalSpeed);
+        verticalVelocity = Vector3.ClampMagnitude(verticalVelocity, WeightAffectedValue(maxVerticalSpeed));
         _rigidbody.linearVelocity = horizontalVelocity + verticalVelocity;
     }
     
@@ -228,23 +242,12 @@ public class PlayerFlyingMovement : MonoBehaviour
         StartCoroutine(StunCoroutine());
     }
 
-    private IEnumerator StunCoroutine()
+    private float WeightAffectedValue(float maxSpeed)
     {
-        var startPos = transform.position;
-        var endPos = startPos + _stunDirection.normalized;
-        var cTime = 0f;
-
-        
-        while (cTime < stunDuration)
-        {
-            cTime += Time.deltaTime;
-            var step = cTime / stunDuration;
-            transform.position = Vector3.Lerp(startPos, endPos, step); 
-            yield return null;
-        }
-
-        IsStunned = false;
+        // Affect the value based on the weight of the package
+        return maxSpeed * PackagePickupController.Instance.GetCarryingWeightPerc();
     }
+    
     #region Rotation
     
     private void HandleRotation()
@@ -254,6 +257,12 @@ public class PlayerFlyingMovement : MonoBehaviour
             return;
         }
         var flyDirection = freeLookCamera.transform.forward.normalized;
+        
+        if (PackagePickupController.Instance.IsHoldingLargePackage())
+        {
+            flyDirection = Vector3.ProjectOnPlane(flyDirection, Vector3.up);
+        }
+        
         var rotateDirection = Vector3.RotateTowards(
             model.forward, 
             flyDirection, 
@@ -285,10 +294,28 @@ public class PlayerFlyingMovement : MonoBehaviour
         _currentSwayFrequency = Mathf.Lerp(_currentSwayFrequency, swayFrequency, Time.deltaTime * transitionSpeed);
 
         var time = Time.time;
-        var bobOffset = Mathf.Sin(time * _currentBobFrequency) * _currentBobAmplitude;
-        var swayOffset = Mathf.Cos(time * _currentSwayFrequency) * _currentSwayAmplitude;
+        var bobOffset = Mathf.Sin(time * WeightAffectedValue(_currentBobFrequency)) * WeightAffectedValue(_currentBobAmplitude);
+        var swayOffset = Mathf.Cos(time * WeightAffectedValue(_currentSwayFrequency)) * WeightAffectedValue(_currentSwayAmplitude);
         
         model.localPosition = _initialLocalPos + new Vector3(swayOffset, bobOffset, 0f);
+    }
+    
+    private IEnumerator StunCoroutine()
+    {
+        var startPos = transform.position;
+        var endPos = startPos + _stunDirection.normalized;
+        var cTime = 0f;
+
+        
+        while (cTime < stunDuration)
+        {
+            cTime += Time.deltaTime;
+            var step = cTime / stunDuration;
+            transform.position = Vector3.Lerp(startPos, endPos, step); 
+            yield return null;
+        }
+
+        IsStunned = false;
     }
     #endregion
 

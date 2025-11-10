@@ -79,13 +79,7 @@ public class OrderUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         StartButton.interactable = false;
         StartButtonText.text = "Delivering";
         
-        GameManager.Instance.AssignJob(
-            _orderData.Pickup, 
-            _orderData.Dropoff,
-            _orderData.PackageHealth,
-            _orderData.Pay,
-            _orderData.Tip,
-            FinishedJob);
+        GameManager.Instance.AssignJob(_orderData, FinishedJob);
     }
 
     public void FinishedJob()
