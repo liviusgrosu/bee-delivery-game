@@ -16,3 +16,5 @@ MonoBehaviour:
   Dropoff: Tower
   Pay: 10
   Weight: 5
+  Tip: 0
+  PackageHealth: 100

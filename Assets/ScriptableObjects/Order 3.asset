@@ -16,3 +16,5 @@ MonoBehaviour:
   Dropoff: City Centre
   Pay: 30
   Weight: 10
+  Tip: 0
+  PackageHealth: 100

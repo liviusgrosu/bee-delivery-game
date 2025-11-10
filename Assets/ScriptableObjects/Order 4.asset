@@ -16,3 +16,5 @@ MonoBehaviour:
   Dropoff: Camp
   Pay: 50
   Weight: 4
+  Tip: 0
+  PackageHealth: 100
