@@ -1,17 +1,19 @@
 ﻿
 using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PackagePickupController : MonoBehaviour
 {
     public static PackagePickupController Instance;
+    [SerializeField] private Transform BeeModelForward;
     [SerializeField] private Transform packageClampPosition;
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
     [SerializeField] private float largePackageThreshold = 5f;
     [SerializeField] private float maxPackageWeight = 10f;
     public bool IsHoldingPackage => _pickedUpItem != null;
-    private Package _currentPackageComp;
+    public Package CurrentPackageComp;
 
     private void Awake()
     {
@@ -44,30 +46,29 @@ public class PackagePickupController : MonoBehaviour
     private void PickUpPackage()
     {
         _pickedUpItem =  _potentialPickUpItem;
-        _currentPackageComp = _pickedUpItem.GetComponent<Package>();
+        CurrentPackageComp = _pickedUpItem.GetComponent<Package>();
                 
-        if (_currentPackageComp )
+        if (CurrentPackageComp )
         {
-            if (!_currentPackageComp .Interactable)
+            if (!CurrentPackageComp .Interactable)
             {
                 return;
             }
-            _currentPackageComp .PickUp();
+            CurrentPackageComp .PickUp();
         }
         
         GameManager.Instance.PickedUpPackage();
         BeeAnimation.Instance.PickUp();
-        
-        _pickedUpItem.parent = packageClampPosition;
+        // Doing this so the package doesn't move the player during this process
         // Provided that the model has a Vector3.eular rotation of Vector3.zero
-        _pickedUpItem.rotation = packageClampPosition.rotation;
-        StartCoroutine(PickUpPackageAnimation(_pickedUpItem.position, _currentPackageComp .PickupDistance));
+        StartCoroutine(PickUpPackageAnimation(_pickedUpItem.position, CurrentPackageComp .PickupDistance));
     }
 
     private IEnumerator PickUpPackageAnimation(Vector3 start, Vector3 offset)
     {
+        CurrentPackageComp.Collider.enabled = false;
         var timePassed = 0f;
-        var animationTime = 0.1f;
+        var animationTime = 1f;
         while (timePassed < animationTime)
         {
             var step = timePassed / animationTime;
@@ -75,6 +76,8 @@ public class PackagePickupController : MonoBehaviour
             timePassed += Time.deltaTime;
             yield return null;
         }
+        _pickedUpItem.parent = packageClampPosition;
+        CurrentPackageComp.Collider.enabled = true;
     }
 
     private void DropPackage(bool state)
@@ -89,9 +92,9 @@ public class PackagePickupController : MonoBehaviour
     private void DropPackage()
     {
         BeeAnimation.Instance.DropOff();
-        _currentPackageComp .DropOff();
+        CurrentPackageComp.DropOff();
         
-        _currentPackageComp = null;
+        CurrentPackageComp = null;
         _pickedUpItem.parent = null;
         _pickedUpItem = null;
         _potentialPickUpItem = null;
@@ -100,14 +103,14 @@ public class PackagePickupController : MonoBehaviour
     
     public bool IsHoldingLargePackage()
     {
-        return _pickedUpItem && _currentPackageComp.CurrentWeight >= largePackageThreshold;
+        return _pickedUpItem && CurrentPackageComp.CurrentWeight >= largePackageThreshold;
     }
 
     public float GetCarryingWeightPerc()
     {
         return !_pickedUpItem 
             ? 1f 
-            : Mathf.Clamp01((maxPackageWeight - _currentPackageComp.CurrentWeight) / maxPackageWeight);
+            : Mathf.Clamp01((maxPackageWeight - CurrentPackageComp.CurrentWeight) / maxPackageWeight);
     }
     
     private void OnTriggerEnter(Collider other)

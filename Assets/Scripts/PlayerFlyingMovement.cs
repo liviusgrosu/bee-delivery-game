@@ -67,7 +67,8 @@ public class PlayerFlyingMovement : MonoBehaviour
     [SerializeField] private Transform model;
     private Vector3 _initialLocalPos;
     private float _currentSwayTime;
-    private Rigidbody _rigidbody;
+    [HideInInspector]
+    public Rigidbody Rigidbody;
     
     // Events
     public static event Action<Vector3> RigidBodyVelocityChange;
@@ -82,8 +83,8 @@ public class PlayerFlyingMovement : MonoBehaviour
         
         Instance = this;
         
-        _rigidbody = GetComponent<Rigidbody>();
-        _rigidbody.linearDamping = 0f;
+        Rigidbody = GetComponent<Rigidbody>();
+        Rigidbody.linearDamping = 0f;
     }
 
     private void Start()
@@ -104,7 +105,7 @@ public class PlayerFlyingMovement : MonoBehaviour
         }
 
         // Store previous velocity as this happens after OnCollisionEnter
-        _previousVelocity = _rigidbody.linearVelocity;
+        _previousVelocity = Rigidbody.linearVelocity;
         
         if (!IsStunned)
         {
@@ -152,7 +153,7 @@ public class PlayerFlyingMovement : MonoBehaviour
             relativeForce.y += _inputDirection.y * verticalAcceleration;
         }
         
-        _rigidbody.AddForce(relativeForce, ForceMode.Acceleration);
+        Rigidbody.AddForce(relativeForce, ForceMode.Acceleration);
     }
 
     private Vector3 GetRelativeForceDirection(Vector3 force)
@@ -189,16 +190,16 @@ public class PlayerFlyingMovement : MonoBehaviour
     
     private void ApplyDrag()
     {
-        if (_inputDirection.magnitude < 0.1f && _rigidbody.linearVelocity.magnitude > 0.1f)
+        if (_inputDirection.magnitude < 0.1f && Rigidbody.linearVelocity.magnitude > 0.1f)
         {
-            _rigidbody.linearVelocity *= (1f - drag * Time.fixedDeltaTime);
+            Rigidbody.linearVelocity *= (1f - drag * Time.fixedDeltaTime);
         }
     }
     
     private void ClampVelocity()
     {
-        var horizontalVelocity = new Vector3(_rigidbody.linearVelocity.x, 0, _rigidbody.linearVelocity.z);
-        var verticalVelocity = new Vector3(0, _rigidbody.linearVelocity.y, 0);
+        var horizontalVelocity = new Vector3(Rigidbody.linearVelocity.x, 0, Rigidbody.linearVelocity.z);
+        var verticalVelocity = new Vector3(0, Rigidbody.linearVelocity.y, 0);
     
         // Clamp horizontal speed
         if (horizontalVelocity.magnitude > WeightAffectedValue(maxHorizontalSpeed))
@@ -208,7 +209,7 @@ public class PlayerFlyingMovement : MonoBehaviour
     
         // Clamp vertical speed separately
         verticalVelocity = Vector3.ClampMagnitude(verticalVelocity, WeightAffectedValue(maxVerticalSpeed));
-        _rigidbody.linearVelocity = horizontalVelocity + verticalVelocity;
+        Rigidbody.linearVelocity = horizontalVelocity + verticalVelocity;
     }
     
     private void HandleFreeLooking()
@@ -229,17 +230,27 @@ public class PlayerFlyingMovement : MonoBehaviour
 
     private void OnCollisionEnter(Collision other)
     {
-        if (!(_previousVelocity.magnitude >= stunSpeedThreshold) /*||
-            other.gameObject.layer != LayerMask.NameToLayer("Environment")*/)
+        foreach (ContactPoint contact in other.contacts)
         {
-            return;
+            if (contact.thisCollider.CompareTag("Player"))
+            {
+                if (!(_previousVelocity.magnitude >= stunSpeedThreshold) /*||
+    other.gameObject.layer != LayerMask.NameToLayer("Environment")*/)
+                {
+                    return;
+                }
+                var normal = other.contacts[0].normal;
+                _stunDirection = Vector3.Reflect(_previousVelocity, normal);
+                IsStunned = true;
+                IsFreeLooking = false;
+                Rigidbody.linearVelocity = Vector3.zero;
+                StartCoroutine(StunCoroutine());
+            }
+            else if (contact.thisCollider.CompareTag("Package"))
+            {
+                PackagePickupController.Instance.CurrentPackageComp.TakeDamage(_previousVelocity.magnitude);
+            }
         }
-        var normal = other.contacts[0].normal;
-        _stunDirection = Vector3.Reflect(_previousVelocity, normal);
-        IsStunned = true;
-        IsFreeLooking = false;
-        _rigidbody.linearVelocity = Vector3.zero;
-        StartCoroutine(StunCoroutine());
     }
 
     private float WeightAffectedValue(float maxSpeed)
@@ -269,6 +280,7 @@ public class PlayerFlyingMovement : MonoBehaviour
             maxRotationSpeed * Time.deltaTime,
             0.0f
         );
+        
         model.rotation = Quaternion.LookRotation(rotateDirection);
     }
     
@@ -323,7 +335,7 @@ public class PlayerFlyingMovement : MonoBehaviour
 
     private void DebugOutputSpeed()
     {
-        RigidBodyVelocityChange?.Invoke(_rigidbody.linearVelocity);
+        RigidBodyVelocityChange?.Invoke(Rigidbody.linearVelocity);
     }
 
     #endregion

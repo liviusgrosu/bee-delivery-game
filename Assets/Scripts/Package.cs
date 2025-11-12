@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Package : MonoBehaviour
@@ -6,7 +7,7 @@ public class Package : MonoBehaviour
     public float MaxHP;
     public MeshRenderer _boxRenderer;
     private Rigidbody _rigidBody;
-    private Collider _collider;
+    public Collider Collider;
     private float _currentSpeed;
     private bool _takenDamage;
     public Transform PickUpPoint;
@@ -16,11 +17,13 @@ public class Package : MonoBehaviour
     public float PayOut = 1f;
     public float PotentialTip;
     public float CurrentWeight;
+
+    private float _iFrameCurrentTime;
     
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody>();
-        _collider = GetComponent<Collider>();
+        Collider = GetComponent<Collider>();
         PickupDistance = transform.position - PickUpPoint.position;
     }
 
@@ -31,6 +34,12 @@ public class Package : MonoBehaviour
     
     private void Update()
     {
+        if (!_rigidBody)
+        {
+            return;
+        }
+        
+        // This only applies to when the package is not picked up
         _currentSpeed = _rigidBody.linearVelocity.magnitude;
         if (Mathf.Approximately(_currentSpeed, 0f))
         {
@@ -40,12 +49,18 @@ public class Package : MonoBehaviour
     
     public void OnCollisionEnter(Collision other)
     {
-        if (_takenDamage || other.gameObject.layer != LayerMask.NameToLayer("Environment"))
+        TakeDamage(_currentSpeed);
+    }
+
+    public void TakeDamage(float speed)
+    {
+        if (_takenDamage /*|| other.gameObject.layer != LayerMask.NameToLayer("Environment")*/)
         {
             return;
         }
-        _takenDamage = true;
-        _currentHealth -= _currentSpeed;
+        Debug.Log($"Taken {speed} dmg");
+        StartCoroutine(IFrameCooldown());
+        _currentHealth -= speed;
         if (_currentHealth <= 0)
         {
             Destroy(gameObject);
@@ -53,6 +68,13 @@ public class Package : MonoBehaviour
         UpdateCondition();
     }
 
+    private IEnumerator IFrameCooldown()
+    {
+        _takenDamage = true;
+        yield return new WaitForSeconds(0.5f);
+        _takenDamage = false;
+    }
+    
     private void UpdateCondition()
     {
         foreach(var condition in PackageConditions)
@@ -68,16 +90,14 @@ public class Package : MonoBehaviour
     
     public void PickUp()
     {
-        _rigidBody.useGravity = false;
-        _rigidBody.isKinematic = true;
-        _collider.enabled = false;
+        Destroy(_rigidBody);
     }
 
     public void DropOff()
     {
+        _rigidBody = gameObject.AddComponent<Rigidbody>();
         _rigidBody.useGravity = true;
         _rigidBody.isKinematic = false;
-        _collider.enabled = true;
     }
 
     public float GetHealthPercentage()
