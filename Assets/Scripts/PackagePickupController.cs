@@ -12,9 +12,12 @@ public class PackagePickupController : MonoBehaviour
     private Transform _pickedUpItem;
     [SerializeField] private float largePackageThreshold = 5f;
     [SerializeField] private float maxPackageWeight = 10f;
+    [SerializeField] private float packageDamageThreshold = 10f;
+    [SerializeField] private float largePackageRotationSpeed = 20f;
     public bool IsHoldingPackage => _pickedUpItem != null;
     public Package CurrentPackageComp;
 
+    
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -40,6 +43,13 @@ public class PackagePickupController : MonoBehaviour
             {
                 DropPackage();
             }
+        }
+
+        if (_pickedUpItem && IsHoldingPackage)
+        {
+            var rotateInput = (Input.GetKey(KeyCode.Q) ? 1f : 0f) 
+                           + (Input.GetKey(KeyCode.E) ? -1f : 0f); 
+            _pickedUpItem.Rotate(_pickedUpItem.up, rotateInput * largePackageRotationSpeed * Time.deltaTime);
         }
     }
 
