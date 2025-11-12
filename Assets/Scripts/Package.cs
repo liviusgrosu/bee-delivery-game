@@ -19,6 +19,7 @@ public class Package : MonoBehaviour
     public float CurrentWeight;
 
     private float _iFrameCurrentTime;
+    public GameObject DustParticle;
     
     private void Awake()
     {
@@ -49,16 +50,23 @@ public class Package : MonoBehaviour
     
     public void OnCollisionEnter(Collision other)
     {
-        TakeDamage(_currentSpeed);
+        if (other.collider.CompareTag("Player"))
+        {
+            return;
+        }
+        
+        TakeDamage(_currentSpeed, other.contacts);
     }
 
-    public void TakeDamage(float speed)
+    public void TakeDamage(float speed, ContactPoint[] contactPoints)
     {
         if (_takenDamage /*|| other.gameObject.layer != LayerMask.NameToLayer("Environment")*/)
         {
             return;
         }
-        Debug.Log($"Taken {speed} dmg");
+        SpawnDustParticles(contactPoints);
+        
+        
         StartCoroutine(IFrameCooldown());
         _currentHealth -= speed;
         if (_currentHealth <= 0)
@@ -66,6 +74,15 @@ public class Package : MonoBehaviour
             Destroy(gameObject);
         }
         UpdateCondition();
+    }
+
+    private void SpawnDustParticles(ContactPoint[] contactPoints)
+    {
+        foreach (var contactPoint in contactPoints)
+        {
+            var dust = Instantiate(DustParticle, contactPoint.point, Quaternion.identity);
+            Destroy(dust, 1f);
+        }
     }
 
     private IEnumerator IFrameCooldown()

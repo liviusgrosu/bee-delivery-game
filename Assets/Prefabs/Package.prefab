@@ -82,7 +82,7 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 4de9d4572aee0ac4abed3e25e0c5b9df, type: 2}
     - target: {fileID: 919132149155446097, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
       propertyPath: m_Name
-      value: Package V2
+      value: Package
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}
       propertyPath: m_TagString
@@ -172,8 +172,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5bbc917843012418bc6973c2b1fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Health: 100
+  _currentHealth: 0
+  MaxHP: 0
   _boxRenderer: {fileID: 5197980012385856303}
+  Collider: {fileID: 0}
+  PickUpPoint: {fileID: 0}
+  PickupDistance: {x: 0, y: 0, z: 0}
   PackageConditions:
   - Health: 100
     Material: {fileID: 2100000, guid: 0a6f29446d485f842abcbf166f794aa8, type: 2}
@@ -184,3 +188,7 @@ MonoBehaviour:
   - Health: 10
     Material: {fileID: 2100000, guid: fe65896c2cc4c274785863c361107ee6, type: 2}
   Interactable: 1
+  PayOut: 1
+  PotentialTip: 0
+  CurrentWeight: 0
+  DustParticle: {fileID: 5793814835570901243, guid: 07a17d7611f1f3240ad00f8b28768164, type: 3}

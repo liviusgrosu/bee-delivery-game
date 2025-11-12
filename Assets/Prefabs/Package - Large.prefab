@@ -216,6 +216,7 @@ MonoBehaviour:
   _currentHealth: 0
   MaxHP: 0
   _boxRenderer: {fileID: 3478970959495432037}
+  Collider: {fileID: 0}
   PickUpPoint: {fileID: 3335532705308729774}
   PickupDistance: {x: 0, y: 0, z: 0}
   PackageConditions:
@@ -230,6 +231,8 @@ MonoBehaviour:
   Interactable: 1
   PayOut: 1
   PotentialTip: 0
+  CurrentWeight: 0
+  DustParticle: {fileID: 5793814835570901243, guid: 8ac11bab3fea98448a3e01f52167bf0c, type: 3}
 --- !u!4 &634219534799877697 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 4210b1612e8dd4e42947dbe6af2d9197, type: 3}

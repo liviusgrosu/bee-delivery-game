@@ -248,7 +248,8 @@ public class PlayerFlyingMovement : MonoBehaviour
             }
             else if (contact.thisCollider.CompareTag("Package"))
             {
-                PackagePickupController.Instance.CurrentPackageComp.TakeDamage(_previousVelocity.magnitude);
+                PackagePickupController.Instance.CurrentPackageComp.TakeDamage(
+                    _previousVelocity.magnitude, other.contacts);
             }
         }
     }
