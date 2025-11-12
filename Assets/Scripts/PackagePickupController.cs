@@ -1,6 +1,6 @@
 ﻿
+using System;
 using System.Collections;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PackagePickupController : MonoBehaviour
@@ -17,6 +17,8 @@ public class PackagePickupController : MonoBehaviour
     public bool IsHoldingPackage => _pickedUpItem != null;
     public Package CurrentPackageComp;
 
+    public static event Action PickUpPackageEvent;
+    public static event Action DropPackageEvent;
     
     private void Awake()
     {
@@ -67,6 +69,7 @@ public class PackagePickupController : MonoBehaviour
             CurrentPackageComp .PickUp();
         }
         
+        PickUpPackageEvent?.Invoke();
         GameManager.Instance.PickedUpPackage();
         BeeAnimation.Instance.PickUp();
         // Doing this so the package doesn't move the player during this process
@@ -78,7 +81,7 @@ public class PackagePickupController : MonoBehaviour
     {
         CurrentPackageComp.Collider.enabled = false;
         var timePassed = 0f;
-        var animationTime = 1f;
+        var animationTime = 0.2f;
         while (timePassed < animationTime)
         {
             var step = timePassed / animationTime;
@@ -101,6 +104,7 @@ public class PackagePickupController : MonoBehaviour
     
     private void DropPackage()
     {
+        DropPackageEvent?.Invoke();
         BeeAnimation.Instance.DropOff();
         CurrentPackageComp.DropOff();
         
