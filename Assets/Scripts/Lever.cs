@@ -10,7 +10,8 @@ public class Lever : MonoBehaviour
         Neutral ,
         Min
     }
-    
+
+    private State _previousState;
     private State _currentState;
 
     public bool IsBeingGripped;
@@ -52,6 +53,13 @@ public class Lever : MonoBehaviour
         {
             _currentState = State.Neutral;
         }
+
+        if (_previousState != _currentState)
+        {
+            // TODO: Trigger something...
+        }
+
+        _previousState = _currentState;
     }
 
     public void StartGrip()
