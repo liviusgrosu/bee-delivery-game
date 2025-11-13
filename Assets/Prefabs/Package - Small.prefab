@@ -211,8 +211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5bbc917843012418bc6973c2b1fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentHealth: 0
-  MaxHP: 0
+  _currentHealth: 100
+  MaxHP: 100
   _boxRenderer: {fileID: 5197980012385856303}
   Collider: {fileID: 0}
   PickUpPoint: {fileID: 4394871551227795373}

@@ -161,7 +161,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 254140989263604987}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 100
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -213,8 +213,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1a5bbc917843012418bc6973c2b1fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _currentHealth: 0
-  MaxHP: 0
+  _currentHealth: 100
+  MaxHP: 100
   _boxRenderer: {fileID: 3478970959495432037}
   Collider: {fileID: 0}
   PickUpPoint: {fileID: 3335532705308729774}

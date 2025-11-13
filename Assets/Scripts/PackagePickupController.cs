@@ -8,15 +8,20 @@ public class PackagePickupController : MonoBehaviour
     public static PackagePickupController Instance;
     [SerializeField] private Transform BeeModelForward;
     [SerializeField] private Transform packageClampPosition;
+    // Packages
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
+    // Grips
+    private Transform _potentialGrip;
+    private Transform _grippedItem;
     [SerializeField] private float largePackageThreshold = 5f;
     [SerializeField] private float maxPackageWeight = 10f;
     [SerializeField] private float packageDamageThreshold = 10f;
     [SerializeField] private float largePackageRotationSpeed = 20f;
+    // Packages
     public bool IsHoldingPackage => _pickedUpItem != null;
     public Package CurrentPackageComp;
-
+    
     public static event Action PickUpPackageEvent;
     public static event Action DropPackageEvent;
     
@@ -37,6 +42,17 @@ public class PackagePickupController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
+            // Grippable objects
+            if (_potentialGrip && !_grippedItem)
+            {
+                StartGripping();
+            }
+            else if (_grippedItem)
+            {
+                StopGripping();
+            }
+            
+            // Packages
             if (_potentialPickUpItem && !_pickedUpItem)
             {
                 PickUpPackage();
@@ -114,7 +130,6 @@ public class PackagePickupController : MonoBehaviour
         _potentialPickUpItem = null;
     }
     
-    
     public bool IsHoldingLargePackage()
     {
         return _pickedUpItem && CurrentPackageComp.CurrentWeight >= largePackageThreshold;
@@ -126,12 +141,37 @@ public class PackagePickupController : MonoBehaviour
             ? 1f 
             : Mathf.Clamp01((maxPackageWeight - CurrentPackageComp.CurrentWeight) / maxPackageWeight);
     }
+
+    private void StartGripping()
+    {
+        _grippedItem = _potentialGrip;
+        // Turn off all movement scripts
+        PlayerFlyingMovement.Instance.enabled = false;
+        var lever = _grippedItem.GetComponent<Lever>();
+        var gripPosition = _grippedItem.Find("Grip Position");
+        // Turn on the grip controller
+        PlayerGripController.Instance.enabled = true;
+        PlayerGripController.Instance.Init(lever, gripPosition);
+        // Make model face a certain direction
+        // Make sure to store that direction when we stop gripping
+    }
+
+    private void StopGripping()
+    {
+        PlayerFlyingMovement.Instance.enabled = true;
+        _grippedItem = _potentialGrip = null;
+        PlayerGripController.Instance.Disable();
+    }
     
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Package"))
         {
             _potentialPickUpItem = other.transform;
+        }
+        else if (other.CompareTag("Grip"))
+        {
+            _potentialGrip = other.transform;            
         }
     }
 
@@ -140,6 +180,10 @@ public class PackagePickupController : MonoBehaviour
         if (other.CompareTag("Package"))
         {
             _potentialPickUpItem = null;
+        }
+        else if (other.CompareTag("Grip"))
+        {
+            _potentialGrip = null;
         }
     }
 }
