@@ -167,7 +167,7 @@ public class PlayerFlyingMovement : MonoBehaviour
         
         var freeLockCamRelativeAxis = freeLookCamera.transform.TransformDirection(force);
         
-        Debug.DrawRay(transform.position, freeLockCamRelativeAxis, Color.red);
+        //Debug.DrawRay(transform.position, freeLockCamRelativeAxis, Color.red);
 
         return freeLockCamRelativeAxis;
     }
@@ -270,7 +270,8 @@ public class PlayerFlyingMovement : MonoBehaviour
         }
         var flyDirection = freeLookCamera.transform.forward.normalized;
         
-        if (PackagePickupController.Instance.IsHoldingLargePackage())
+        if (PackagePickupController.Instance.IsHoldingLargePackage() ||
+            PackagePickupController.Instance.IsHoldingLargeObject())
         {
             flyDirection = Vector3.ProjectOnPlane(flyDirection, Vector3.up);
         }

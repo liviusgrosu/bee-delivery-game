@@ -1,14 +1,12 @@
 ﻿using UnityEngine;
 
-public class PlayerGripController : MonoBehaviour
+public class PlayerLeverGripController : MonoBehaviour
 {
-    public static PlayerGripController Instance;
+    public static PlayerLeverGripController Instance;
 
     private Lever _lever;
     private Transform _anchor;
     private JointMotor _motor;
-    [SerializeField] private float motorSpeed = 2f;
-    [SerializeField] private float motorForce = 100f;
 
     private void Awake()
     {
@@ -43,7 +41,6 @@ public class PlayerGripController : MonoBehaviour
             return;
         }
         transform.position = _anchor.position;
-        var input = motorSpeed * Time.deltaTime * Input.GetAxis("Vertical");
-        _lever.UpdateSpeed(input);
+        _lever.UpdateSpeed();
     }
 }

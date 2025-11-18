@@ -23,7 +23,5 @@ public class CameraManager : MonoBehaviour
     {
         defaultCameraView.Priority.Value = 0;
         largePackageCameraView.Priority.Value = 1;
-        /*defaultCameraView.SetActive(false);
-        largePackageCameraView.SetActive(true);*/
     }
 }

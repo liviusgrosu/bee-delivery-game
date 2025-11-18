@@ -6,7 +6,9 @@ TagManager:
   tags:
   - Box
   - Package
-  - Grip
+  - Lever
+  - Sliding Box
+  - Puzzle Ball
   layers:
   - Default
   - TransparentFX
@@ -17,8 +19,8 @@ TagManager:
   - Box
   - Avoid Landing
   - Environment
-  - 
-  - 
+  - Sliding Box
+  - Invisible Nonplayer
   - 
   - 
   - 

@@ -13,8 +13,6 @@ public class Lever : MonoBehaviour
 
     private State _previousState;
     private State _currentState;
-
-    public bool IsBeingGripped;
     private HingeJoint _joint;
     private JointMotor _motor;
     private JointSpring _spring;
@@ -31,7 +29,7 @@ public class Lever : MonoBehaviour
         SetSpringState();
     }
 
-    public void UpdateSpeed(float speed)
+    public void UpdateSpeed()
     {
         var input = motorSpeed * Time.deltaTime * Input.GetAxis("Vertical");
         _motor.targetVelocity = input;
@@ -90,7 +88,6 @@ public class Lever : MonoBehaviour
                 _ => 0f
             };
             
-        
         _joint.spring = _spring;
     }
 }
