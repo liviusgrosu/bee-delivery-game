@@ -3,7 +3,7 @@
 public class BallPitTrigger : MonoBehaviour
 {
     [SerializeField]
-    private DebugStateObject debugStateObject;
+    private GameObject debugStateObject;
 
     [SerializeField] private Transform triggeringBall;
     private bool _isOn;
@@ -14,7 +14,7 @@ public class BallPitTrigger : MonoBehaviour
         {
             return;
         }
-        debugStateObject.TriggerOn();
+        debugStateObject.GetComponent<ITriggerObjects>().TriggerOn();
         _isOn = true;
     }
     
@@ -24,7 +24,7 @@ public class BallPitTrigger : MonoBehaviour
         {
             return;
         }
-        debugStateObject.TriggerOff();
+        debugStateObject.GetComponent<ITriggerObjects>().TriggerOff();
         _isOn = false;
     }
 }

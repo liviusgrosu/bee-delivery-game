@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class DebugStateObject : MonoBehaviour
+public class DebugStateObject : MonoBehaviour, ITriggerObjects
 {
     [SerializeField]
     private Material onMaterial, offMaterial;

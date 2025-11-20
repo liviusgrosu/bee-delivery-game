@@ -9,6 +9,7 @@ TagManager:
   - Lever
   - Sliding Box
   - Puzzle Ball
+  - Rubble
   layers:
   - Default
   - TransparentFX
