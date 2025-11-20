@@ -13,6 +13,9 @@ public class PackagePickupController : MonoBehaviour
     // Packages
     private Transform _potentialPickUpItem;
     private Transform _pickedUpItem;
+    // Rubble
+    private Transform _potentialRubble;
+    private Transform _grippedRubble;
     // Puzzle Ball
     private Transform _potentialPuzzleBallItem;
     private Transform _grippedPuzzleBall;
@@ -69,6 +72,16 @@ public class PackagePickupController : MonoBehaviour
             else if (_grippedPuzzleBall)
             {
                 StopGrippingPuzzleBall();
+            }
+            
+            // Rubble
+            if (_potentialRubble && !_grippedRubble)
+            {
+                StartGrippingRubble();
+            }
+            else if (_grippedRubble)
+            {
+                StopGrippingRubble();
             }
             
             // Sliding Box
@@ -165,7 +178,7 @@ public class PackagePickupController : MonoBehaviour
 
     public bool IsHoldingLargeObject()
     {
-        return _grippedPuzzleBall;
+        return _grippedPuzzleBall || _grippedRubble;
     }
 
     public float GetCarryingWeightPerc()
@@ -174,6 +187,8 @@ public class PackagePickupController : MonoBehaviour
             ? 1f 
             : Mathf.Clamp01((maxPackageWeight - CurrentPackageComp.CurrentWeight) / maxPackageWeight);
     }
+
+    #region Lever
 
     private void StartGrippingLever()
     {
@@ -196,6 +211,10 @@ public class PackagePickupController : MonoBehaviour
         PlayerLeverGripController.Instance.Disable();
     }
 
+    #endregion
+
+    #region Sliding Box
+
     private void StartGrippingSlidingBox()
     {
         _grippedSlidingBox = _potentialSlidingBox;
@@ -213,6 +232,10 @@ public class PackagePickupController : MonoBehaviour
         PlayerSlidingBoxGripController.Instance.Disable();
     }
 
+    #endregion
+
+    #region Puzzle Box
+    
     private void StartGrippingPuzzleBall()
     {
         _grippedPuzzleBall = _potentialPuzzleBallItem;
@@ -231,6 +254,30 @@ public class PackagePickupController : MonoBehaviour
         _grippedPuzzleBall = _potentialPuzzleBallItem = null;
     }
     
+    #endregion
+    
+    #region Rubble
+    
+    private void StartGrippingRubble()
+    {
+        _grippedRubble = _potentialRubble;
+        var rubble = _grippedRubble.GetComponent<Rubble>();
+        rubble.Pickup(BeeModel.position, packageClampPosition);
+        PickUpPackageEvent?.Invoke();
+        BeeAnimation.Instance.PickUp();
+    }
+
+    private void StopGrippingRubble()
+    {
+        DropPackageEvent?.Invoke();
+        BeeAnimation.Instance.DropOff();
+        var rubble = _grippedRubble.GetComponent<Rubble>();
+        rubble.DropOff();
+        _grippedRubble = _potentialRubble = null;
+    }
+    
+    #endregion
+
     private void OnTriggerEnter(Collider other)
     {
         Debug.Log($"Entering trigger with tag {other.tag}");
@@ -249,6 +296,10 @@ public class PackagePickupController : MonoBehaviour
         else if (other.CompareTag("Sliding Box"))
         {
             _potentialSlidingBox = other.transform;            
+        }
+        else if (other.CompareTag("Rubble"))
+        {
+            _potentialRubble = other.transform;
         }
     }
 
@@ -269,6 +320,10 @@ public class PackagePickupController : MonoBehaviour
         else if (other.CompareTag("Sliding Box"))
         {
             _potentialSlidingBox = null;
+        }
+        else if (other.CompareTag("Rubble"))
+        {
+            _potentialRubble = null;
         }
     }
 }
