@@ -4,7 +4,7 @@ public class PlayerLeverGripController : MonoBehaviour
 {
     public static PlayerLeverGripController Instance;
 
-    private Lever _lever;
+    private ILevers _leverTwoState;
     private Transform _anchor;
     private JointMotor _motor;
 
@@ -20,18 +20,18 @@ public class PlayerLeverGripController : MonoBehaviour
         enabled = false;
     }
     
-    public void Init(Lever lever, Transform anchor)
+    public void Init(ILevers leverTwoState, Transform anchor)
     {
-        _lever = lever;
+        _leverTwoState = leverTwoState;
         _anchor = anchor;
-        lever.StartGrip();
+        leverTwoState.StartGrip();
     }
 
     public void Disable()
     {
         _anchor = null;
-        _lever.EndGrip();
-        _lever = null;
+        _leverTwoState.EndGrip();
+        _leverTwoState = null;
     }
     
     private void Update()
@@ -41,6 +41,6 @@ public class PlayerLeverGripController : MonoBehaviour
             return;
         }
         transform.position = _anchor.position;
-        _lever.UpdateSpeed();
+        _leverTwoState.UpdateSpeed();
     }
 }

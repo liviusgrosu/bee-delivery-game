@@ -36,6 +36,7 @@ public class PackagePickupController : MonoBehaviour
     
     public static event Action PickUpPackageEvent;
     public static event Action DropPackageEvent;
+    public static event Action GripSlidingBoxEvent;
     
     private void Awake()
     {
@@ -195,16 +196,16 @@ public class PackagePickupController : MonoBehaviour
         _grippedLever = _potentialLever;
         // Turn off all movement scripts
         PlayerFlyingMovement.Instance.enabled = false;
-        var lever = _grippedLever.GetComponent<Lever>();
+        var lever = _grippedLever.GetComponent<ILevers>();
         var gripPosition = _grippedLever.Find("Grip Position");
         // Turn on the grip controller
         PlayerLeverGripController.Instance.enabled = true;
         PlayerLeverGripController.Instance.Init(lever, gripPosition);
-        // Make model face a certain direction
+        // Make the model face a certain direction
         // Make sure to store that direction when we stop gripping
     }
 
-    private void StopGrippingLever()
+    public void StopGrippingLever()
     {
         PlayerFlyingMovement.Instance.enabled = true;
         _grippedLever = _potentialLever = null;
@@ -217,6 +218,7 @@ public class PackagePickupController : MonoBehaviour
 
     private void StartGrippingSlidingBox()
     {
+        GripSlidingBoxEvent?.Invoke();
         _grippedSlidingBox = _potentialSlidingBox;
         PlayerFlyingMovement.Instance.enabled = false;
         var slidingBox = _grippedSlidingBox.GetComponent<SlidingBox>();
@@ -227,6 +229,7 @@ public class PackagePickupController : MonoBehaviour
 
     private void StopGrippingSlidingBox()
     {
+        DropPackageEvent?.Invoke();
         PlayerFlyingMovement.Instance.enabled = true;
         _grippedSlidingBox = _potentialSlidingBox = null;
         PlayerSlidingBoxGripController.Instance.Disable();

@@ -10,6 +10,7 @@ TagManager:
   - Sliding Box
   - Puzzle Ball
   - Rubble
+  - Water
   layers:
   - Default
   - TransparentFX
@@ -22,8 +23,8 @@ TagManager:
   - Environment
   - Sliding Box
   - Invisible Nonplayer
-  - 
-  - 
+  - Invisible Player Wall
+  - Player
   - 
   - 
   - 

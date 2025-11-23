@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -11,12 +12,16 @@ public class SlidingBox : MonoBehaviour
     [Tooltip("Considers where the movement is relative to where camera is facing")]
     [SerializeField] private bool isCameraRelative;
     private Rigidbody _rigidbody;
+    private List<MeshCollider> _meshColliders;
+    [SerializeField]
+    private GameObject slidingCollider;
 
     private Camera _cam;
     
     private void Start()
     {
         _cam = Camera.main;
+        _meshColliders = new List<MeshCollider>(GetComponentsInChildren<MeshCollider>());
     }
 
     public void UpdateSpeed()
@@ -47,12 +52,16 @@ public class SlidingBox : MonoBehaviour
     public void StartGrip()
     {
         ToggleRigidbody(true);
+        _meshColliders.ForEach(c => c.enabled = false);
+        slidingCollider.SetActive(true);
     }
 
     public void EndGrip()
     {
         ToggleRigidbody(false);
         _rigidbody.linearVelocity = Vector3.zero;
+        _meshColliders.ForEach(c => c.enabled = true);
+        slidingCollider.SetActive(false);
     }
 
     private void ToggleRigidbody(bool state)
