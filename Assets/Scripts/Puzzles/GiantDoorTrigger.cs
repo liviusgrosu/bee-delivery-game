@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-public class GiantDoorTrigger : MonoBehaviour, ITriggerObjects
+public class GiantDoorTrigger : MonoBehaviour, IToggleObjects
 {
     [SerializeField]
     private Transform endPositionTransform;

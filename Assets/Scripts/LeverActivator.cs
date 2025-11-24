@@ -5,6 +5,7 @@ public class LeverActivator : MonoBehaviour, ILevers
     private HingeJoint _joint;
     private JointMotor _motor;
     private JointSpring _spring;
+    [SerializeField] private GameObject trigger;
     
     [SerializeField] private float stateThreshold = 10f;
     [SerializeField] private float motorSpeed = 10000f;
@@ -23,11 +24,12 @@ public class LeverActivator : MonoBehaviour, ILevers
         _joint.motor = _motor;
         
         var angle = _joint.angle;
-        var max = _joint.limits.max;
+        var max = _joint.limits.max * 2f;
         
         if (angle >= max - stateThreshold) 
         {
             PackagePickupController.Instance.StopGrippingLever();
+            trigger.GetComponent<ITriggerObjects>().Trigger();
         }
     }
     
@@ -44,12 +46,13 @@ public class LeverActivator : MonoBehaviour, ILevers
         _motor.force = 0;
         _joint.motor = _motor;
         _joint.useMotor = false;
+        ResetSpringState();
     }
     
     private void ResetSpringState()
     {
         _joint.useSpring = true;
-        _spring.spring = 10000f;
+        _spring.spring = 50f;
         _spring.targetPosition = _joint.limits.min;
         _joint.spring = _spring;
     }

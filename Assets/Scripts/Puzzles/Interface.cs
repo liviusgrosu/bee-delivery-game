@@ -1,7 +1,12 @@
-﻿public interface ITriggerObjects
+﻿public interface IToggleObjects
 {
     void TriggerOn();
     void TriggerOff();
+}
+
+public interface ITriggerObjects
+{
+    void Trigger();
 }
 
 public interface ILevers

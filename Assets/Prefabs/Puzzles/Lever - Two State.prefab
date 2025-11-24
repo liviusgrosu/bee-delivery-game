@@ -223,7 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   stateThreshold: 10
   motorSpeed: 10000
-  motorForce: 1
+  motorForce: 50
 --- !u!59 &4727988642090028271
 HingeJoint:
   m_ObjectHideFlags: 0
