@@ -26,6 +26,8 @@ public class LeverActivator : MonoBehaviour, ILevers
         var angle = _joint.angle;
         var max = _joint.limits.max * 2f;
         
+        //Debug.Log($"angle: {angle}, max: {max}, threshold: {max - stateThreshold}");
+        
         if (angle >= max - stateThreshold) 
         {
             PackagePickupController.Instance.StopGrippingLever();

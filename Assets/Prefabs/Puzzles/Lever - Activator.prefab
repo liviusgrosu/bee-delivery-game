@@ -122,10 +122,10 @@ PrefabInstance:
       addedObject: {fileID: 8585602477867799343}
     - targetCorrespondingSourceObject: {fileID: 5530701255766440318, guid: e3f0314464bdaf64fb6f84ed12a0a998, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8759370776894748906}
+      addedObject: {fileID: 4188463227243043357}
     - targetCorrespondingSourceObject: {fileID: 5530701255766440318, guid: e3f0314464bdaf64fb6f84ed12a0a998, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 4188463227243043357}
+      addedObject: {fileID: 7314866049660442363}
   m_SourcePrefab: {fileID: 100100000, guid: e3f0314464bdaf64fb6f84ed12a0a998, type: 3}
 --- !u!4 &2037981416665528420 stripped
 Transform:
@@ -185,21 +185,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.331481, y: 1.3999999, z: 6.0985456}
   m_Center: {x: 0, y: -4.9219594e-14, z: 4.96397}
---- !u!114 &8759370776894748906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7731721646739169602}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 95626b29e0c444ad825f0875c52b5488, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  stateThreshold: 10
-  motorSpeed: 10000
-  motorForce: 1
 --- !u!59 &4188463227243043357
 HingeJoint:
   m_ObjectHideFlags: 0
@@ -239,3 +224,19 @@ HingeJoint:
   m_EnablePreprocessing: 1
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!114 &7314866049660442363
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7731721646739169602}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68c6a96e3c174e299b8de5d6a702da8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  trigger: {fileID: 0}
+  stateThreshold: 10
+  motorSpeed: 10000
+  motorForce: 50

@@ -283,7 +283,6 @@ public class PackagePickupController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log($"Entering trigger with tag {other.tag}");
         if (other.CompareTag("Package"))
         {
             _potentialPickUpItem = other.transform;

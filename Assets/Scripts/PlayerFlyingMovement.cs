@@ -47,7 +47,7 @@ public class PlayerFlyingMovement : MonoBehaviour
     private Vector3 _stunDirection;
     private Vector3 _previousVelocity;
     private bool _isStunned;
-
+    
     public bool IsStunned
     {
         get => _isStunned;
@@ -67,6 +67,7 @@ public class PlayerFlyingMovement : MonoBehaviour
     [SerializeField] private Transform model;
     private Vector3 _initialLocalPos;
     private float _currentSwayTime;
+    private bool _isCameraFocused;
     [HideInInspector]
     public Rigidbody Rigidbody;
     
@@ -107,7 +108,7 @@ public class PlayerFlyingMovement : MonoBehaviour
         // Store previous velocity as this happens after OnCollisionEnter
         _previousVelocity = Rigidbody.linearVelocity;
         
-        if (!IsStunned)
+        if (!IsStunned || !_isCameraFocused)
         {
             GetInput();
             HandleRotation();
@@ -118,7 +119,7 @@ public class PlayerFlyingMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!IsStunned)
+        if (!IsStunned || !_isCameraFocused)
         {
             HandleAdvancedMovement();
             ApplyDrag();
@@ -319,7 +320,6 @@ public class PlayerFlyingMovement : MonoBehaviour
         var startPos = transform.position;
         var endPos = startPos + _stunDirection.normalized;
         var cTime = 0f;
-
         
         while (cTime < stunDuration)
         {
@@ -333,6 +333,11 @@ public class PlayerFlyingMovement : MonoBehaviour
     }
     #endregion
 
+    public void ToggleCameraFocus(bool isFocused)
+    {
+        _isCameraFocused = isFocused;
+    }
+    
     #region Debug
 
     private void DebugOutputSpeed()

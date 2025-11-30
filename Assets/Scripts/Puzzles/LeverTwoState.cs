@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public class LeverTwoState : MonoBehaviour, ILevers
 {
@@ -10,19 +11,23 @@ public class LeverTwoState : MonoBehaviour, ILevers
     }
 
     private State _previousState;
-    private State _currentState;
+    [SerializeField]
+    private State currentState = State.Neutral;
     private HingeJoint _joint;
     private JointMotor _motor;
     private JointSpring _spring;
     
+    [SerializeField]
+    private List<GameObject> debugStateObject;
+    
     [SerializeField] private float stateThreshold = 10f;
     [SerializeField] private float motorSpeed = 10000f;
     [SerializeField] private float motorForce = 1f;
-
+    [SerializeField] private bool stopGrippingUponActivation;
+    
     private void Awake()
     {
         _joint = GetComponent<HingeJoint>();
-        _currentState = State.Neutral;
         SetSpringState();
     }
 
@@ -38,23 +43,36 @@ public class LeverTwoState : MonoBehaviour, ILevers
 
         if (angle >= max - stateThreshold) 
         {
-            _currentState = State.Max;
+            currentState = State.Max;
         }
         else if (angle <= min + stateThreshold)
         {
-            _currentState = State.Min;
+            currentState = State.Min;
         }
         else
         {
-            _currentState = State.Neutral;
+            currentState = State.Neutral;
         }
 
-        if (_previousState != _currentState)
+        if (_previousState != currentState)
         {
-            // TODO: Trigger something...
+            if (stopGrippingUponActivation && currentState != State.Neutral)
+            {
+                PackagePickupController.Instance.StopGrippingLever();
+            }
+
+            switch (currentState)
+            {
+                case State.Min:
+                    debugStateObject.ForEach(go => go.GetComponent<IToggleObjects>().TriggerOff());
+                    break;
+                case State.Max:
+                    debugStateObject.ForEach(go => go.GetComponent<IToggleObjects>().TriggerOn());
+                    break;
+            }
         }
 
-        _previousState = _currentState;
+        _previousState = currentState;
     }
 
     public void StartGrip()
@@ -78,7 +96,7 @@ public class LeverTwoState : MonoBehaviour, ILevers
         _joint.useSpring = true;
         _spring.spring = 10000f;
         _spring.targetPosition = 
-            _currentState switch
+            currentState switch
             {
                 State.Max => _joint.limits.max,
                 State.Min => _joint.limits.min,
@@ -87,4 +105,6 @@ public class LeverTwoState : MonoBehaviour, ILevers
             
         _joint.spring = _spring;
     }
+    
+    // It should stop gripping if theres a trigger related to camera
 }
